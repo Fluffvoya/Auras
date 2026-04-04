@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PAMS.Core", "PAMS.Core\PAMS.Core.csproj", "{2918E9CC-4BDE-4A9A-AF40-AD01E8BBCDA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PAMS.CLI", "PAMS.CLI\PAMS.CLI.csproj", "{EA65F9CB-5D24-49A6-9B00-6D6CF4C7CE2D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2918E9CC-4BDE-4A9A-AF40-AD01E8BBCDA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2918E9CC-4BDE-4A9A-AF40-AD01E8BBCDA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2918E9CC-4BDE-4A9A-AF40-AD01E8BBCDA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2918E9CC-4BDE-4A9A-AF40-AD01E8BBCDA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA65F9CB-5D24-49A6-9B00-6D6CF4C7CE2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA65F9CB-5D24-49A6-9B00-6D6CF4C7CE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA65F9CB-5D24-49A6-9B00-6D6CF4C7CE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA65F9CB-5D24-49A6-9B00-6D6CF4C7CE2D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
