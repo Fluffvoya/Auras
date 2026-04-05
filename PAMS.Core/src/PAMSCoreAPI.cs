@@ -10,13 +10,16 @@ public class PAMSCoreAPI
 
     private readonly SearchService _searchService;
 
+    private readonly ArchiveConfigService _archiveConfigService;
+
     private readonly ConfigService _configService;
 
-    public PAMSCoreAPI(string file)
+    public PAMSCoreAPI(string configFile, string archiveRoot)
     {
-        var configRepo = new ConfigRepository(file);
+        var configRepo = new ConfigRepository(configFile);
 
-        var archiveRoot = configRepo.GetArchiveRoot();
+        var archiveConfigRepo
+            = new ArchiveConfigRepository(Path.Combine(archiveRoot, "archive.json"));
 
         var metadataRepo =
             new MetadataRepository(Path.Combine(archiveRoot, "metadata.json"));
@@ -27,14 +30,16 @@ public class PAMSCoreAPI
         var hashIndexRepo =
             new HashIndexRepository(Path.Combine(archiveRoot, "hash_index.json"));
 
-        _fileService = new FileService(metadataRepo, tagIndexRepo, hashIndexRepo, configRepo);
+        _fileService = new FileService(metadataRepo, tagIndexRepo, hashIndexRepo, archiveConfigRepo, configRepo);
         _searchService = new SearchService(metadataRepo, tagIndexRepo);
+        _archiveConfigService = new ArchiveConfigService(archiveConfigRepo);
         _configService = new ConfigService(configRepo);
     }
 
+    public string ArchiveName => _archiveConfigService.ArchiveName;
+
     public void ChangeArchiveRoot(string archiveRoot)
     {
-        _configService.ChangeArchiveRoot(archiveRoot);
     }
 
     public FileRecord ImportFile(string sourcePath,

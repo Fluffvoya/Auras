@@ -32,8 +32,6 @@ public class ConfigRepository
         }
     }
 
-    public string GetArchiveRoot() => Config.ArchiveRoot;
-
     public void Save()
     {
         JsonStorage.Save(_file, Config);

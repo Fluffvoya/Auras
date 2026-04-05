@@ -14,8 +14,7 @@ public class HashIndexRepository
 
         if (File.Exists(file))
         {
-            _index = JsonSerializer.Deserialize<
-                    Dictionary<string, Guid>>
+            _index = JsonSerializer.Deserialize<Dictionary<string, Guid>>
                 (File.ReadAllText(file)) ?? new();
         }
         else

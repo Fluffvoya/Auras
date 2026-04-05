@@ -1,4 +1,5 @@
-﻿using PAMS.Core.Models;
+﻿using System.Text.Json;
+using PAMS.Core.Models;
 using PAMS.Core.Storage;
 
 namespace PAMS.Core.Repositories;
@@ -12,8 +13,16 @@ public class MetadataRepository
     public MetadataRepository(string file)
     {
         _file = file;
-
-        _records = JsonStorage.Load<List<FileRecord>>(_file);
+        
+        if (File.Exists(file))
+        {
+            _records = JsonSerializer.Deserialize<List<FileRecord>>
+                (File.ReadAllText(file)) ?? new();
+        }
+        else
+        {
+            _records = new();
+        }
     }
 
     public List<FileRecord> GetAll()

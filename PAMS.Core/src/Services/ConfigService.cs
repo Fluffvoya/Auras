@@ -10,9 +10,4 @@ public class ConfigService
     {
         _configRepository = configRepository;
     }
-
-    public void ChangeArchiveRoot(string archiveRoot)
-    {
-        
-    }
 }

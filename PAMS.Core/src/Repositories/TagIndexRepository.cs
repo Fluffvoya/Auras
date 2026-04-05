@@ -14,8 +14,7 @@ public class TagIndexRepository
 
         if (File.Exists(file))
         {
-            _index = JsonSerializer.Deserialize<
-                    Dictionary<string, HashSet<Guid>>>
+            _index = JsonSerializer.Deserialize<Dictionary<string, HashSet<Guid>>>
                 (File.ReadAllText(file)) ?? new();
         }
         else

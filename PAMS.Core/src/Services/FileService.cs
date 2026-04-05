@@ -12,17 +12,21 @@ public class FileService
 
     private readonly HashIndexRepository _hashIndex;
 
+    private readonly ArchiveConfigRepository _archiveConfig;
+
     private readonly ConfigRepository _configRepository;
 
     public FileService(
         MetadataRepository metadata,
         TagIndexRepository tagIndex,
         HashIndexRepository hashIndex,
+        ArchiveConfigRepository archiveConfig,
         ConfigRepository configRepository)
     {
         _metadata = metadata;
         _tagIndex = tagIndex;
         _hashIndex = hashIndex;
+        _archiveConfig = archiveConfig;
         _configRepository = configRepository;
     }
 
@@ -38,8 +42,10 @@ public class FileService
             throw new Exception("Duplicate file detected");
 
         var fileName = Path.GetFileName(sourcePath);
+        
+        var rootDir = _archiveConfig.ArchivePath ??"";
 
-        var tagDir = Path.Combine(_configRepository.GetArchiveRoot(), primaryTag);
+        var tagDir = Path.Combine(rootDir, primaryTag);
 
         Directory.CreateDirectory(tagDir);
 
@@ -77,10 +83,12 @@ public class FileService
         if (record == null)
             return;
 
-        var path = Path.Combine(_configRepository.GetArchiveRoot(), record.RelativePath);
+        var rootDir = _archiveConfig.ArchivePath ??"";
+        
+        var file = Path.Combine(rootDir, record.RelativePath);
 
-        if (File.Exists(path))
-            File.Delete(path);
+        if (File.Exists(file))
+            File.Delete(file);
 
         _metadata.Remove(id);
 
