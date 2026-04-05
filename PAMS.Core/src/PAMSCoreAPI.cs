@@ -38,16 +38,48 @@ public class PAMSCoreAPI
 
     public string ArchiveName => _archiveConfigService.ArchiveName;
 
-    public void ChangeArchiveRoot(string archiveRoot)
-    {
-    }
-
     public FileRecord ImportFile(string sourcePath,
         string primaryTag,
         List<string> tags,
         bool move = false)
         => _fileService.ImportFile(sourcePath, primaryTag, tags, move);
 
+
+    public void ChangeFileName(string file, string newFileName)
+    {
+        var fileRecords = _searchService.SearchByName(file);
+        foreach (var fileRecord in fileRecords)
+        {
+            _fileService.ChangeFileName(fileRecord.Id, newFileName);
+        }
+    }
+
+    public void ChangePrimaryTag(string file, string newPrimaryTag)
+    {
+        var fileRecords = _searchService.SearchByName(file);
+        foreach (var fileRecord in fileRecords)
+        {
+            _fileService.ChangePrimaryTag(fileRecord.Id, newPrimaryTag);
+        }
+    }
+
+    public void AddTags(string file, List<string> tags)
+    {
+        var fileRecords = _searchService.SearchByName(file);
+        foreach (var fileRecord in fileRecords)
+        {
+            _fileService.AddTags(fileRecord.Id, tags);
+        }
+    }
+
+    public void RemoveTags(string file, List<string> tags)
+    {
+        var fileRecords = _searchService.SearchByName(file);
+        foreach (var fileRecord in fileRecords)
+        {
+            _fileService.RemoveTags(fileRecord.Id, tags);
+        }
+    }
 
     public void DeleteFile(string file)
     {
@@ -56,11 +88,6 @@ public class PAMSCoreAPI
         {
             _fileService.DeleteFile(fileRecord.Id);
         }
-    }
-
-    public void DeleteFile(Guid id)
-    {
-        _fileService.DeleteFile(id);
     }
 
     public List<FileRecord> SearchByName(string keyword) => _searchService.SearchByName(keyword);
