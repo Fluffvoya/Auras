@@ -41,8 +41,9 @@ public class PAMSCoreAPI
     public FileRecord ImportFile(string sourcePath,
         string primaryTag,
         List<string> tags,
+        string description = "",
         bool move = false)
-        => _fileService.ImportFile(sourcePath, primaryTag, tags, move);
+        => _fileService.ImportFile(sourcePath, primaryTag, tags, description, move);
 
 
     public void ChangeFileName(string file, string newFileName)

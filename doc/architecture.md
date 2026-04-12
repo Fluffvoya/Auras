@@ -24,7 +24,7 @@ PAMS/
 
 | Class | Description |
 |-------|-------------|
-| `FileRecord` | Represents an archived file with metadata (ID, hash, name, tags, path) |
+| `FileRecord` | Represents an archived file with metadata (ID, hash, name, tags, path, description) |
 | `Tag` | Simple tag representation |
 | `Config` | User configuration (username) |
 | `ArchiveConfig` | Archive metadata (name, creation time) |
