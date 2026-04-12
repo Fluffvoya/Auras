@@ -34,6 +34,7 @@ public class FileService
         string sourcePath,
         string primaryTag,
         List<string> tags,
+        string description = "",
         bool move = false)
     {
         var hash = HashHelper.ComputeSHA256(sourcePath);
@@ -64,7 +65,8 @@ public class FileService
             PrimaryTag = primaryTag,
             Tags = tags,
             Hash = hash,
-            CreatedTime = DateTime.UtcNow
+            CreatedTime = DateTime.UtcNow,
+            Description = description
         };
 
         _metadata.Add(record);
