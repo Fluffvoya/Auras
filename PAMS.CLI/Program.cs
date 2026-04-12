@@ -141,7 +141,7 @@ class Program
         if (!RequireArchive()) return true;
         if (commands.Count < 3)
         {
-            Console.WriteLine("Usage: import <source_path> <primary_tag> [tag1,tag2] [--move]");
+            Console.WriteLine("Usage: import <source_path> <primary_tag> [tag1,tag2] [--desc \"description\"] [--move]");
             return true;
         }
 
@@ -149,12 +149,19 @@ class Program
         string primaryTag = commands[2];
         bool move = commands.Contains("--move");
 
-        string? tagsStr = commands.Skip(3).FirstOrDefault(t => t != "--move");
+        string description = "";
+        int descIndex = commands.IndexOf("--desc");
+        if (descIndex >= 0 && descIndex < commands.Count - 1)
+        {
+            description = commands[descIndex + 1];
+        }
+
+        string? tagsStr = commands.Skip(3).FirstOrDefault(t => t != "--move" && t != "--desc" && t != description);
         List<string> tags = ParseTags(tagsStr);
 
         try
         {
-            var record = _api.ImportFile(sourcePath, primaryTag, tags, move);
+            var record = _api.ImportFile(sourcePath, primaryTag, tags, description, move);
             Console.WriteLine($"Successfully imported: {record.Name} (ID: {record.Id})");
         }
         catch (Exception ex)
@@ -275,7 +282,7 @@ class Program
                 foreach (var r in results)
                 {
                     Console.WriteLine(
-                        $" - ID: {r.Id} | Name: {r.Name} | PrimaryTag: {r.PrimaryTag} | Tags: [{string.Join(", ", r.Tags ?? new List<string>())}]");
+                        $" - ID: {r.Id} | Name: {r.Name} | PrimaryTag: {r.PrimaryTag} | Tags: [{string.Join(", ", r.Tags ?? new List<string>())}] | Description: {r.Description}");
                 }
             }
         }
