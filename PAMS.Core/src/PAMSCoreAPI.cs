@@ -45,6 +45,10 @@ public class PAMSCoreAPI
         bool move = false)
         => _fileService.ImportFile(sourcePath, primaryTag, tags, description, move);
 
+    public void ChangeFileName(Guid id, string newFileName)
+    {
+        _fileService.ChangeFileName(id, newFileName);
+    }
 
     public void ChangeFileName(string file, string newFileName)
     {
@@ -53,6 +57,25 @@ public class PAMSCoreAPI
         {
             _fileService.ChangeFileName(fileRecord.Id, newFileName);
         }
+    }
+
+    public void ChangeDescription(Guid id, string newDescription)
+    {
+        _fileService.ChangeDescription(id, newDescription);
+    }
+
+    public void ChangeDescription(string file, string newDescription)
+    {
+        var fileRecords = _searchService.SearchByName(file);
+        foreach (var fileRecord in fileRecords)
+        {
+            _fileService.ChangeDescription(fileRecord.Id, newDescription);
+        }
+    }
+
+    public void ChangePrimaryTag(Guid id, string newPrimaryTag)
+    {
+        _fileService.ChangePrimaryTag(id, newPrimaryTag);
     }
 
     public void ChangePrimaryTag(string file, string newPrimaryTag)
@@ -64,6 +87,11 @@ public class PAMSCoreAPI
         }
     }
 
+    public void AddTags(Guid id, List<string> tags)
+    {
+        _fileService.AddTags(id, tags);
+    }
+
     public void AddTags(string file, List<string> tags)
     {
         var fileRecords = _searchService.SearchByName(file);
@@ -73,6 +101,11 @@ public class PAMSCoreAPI
         }
     }
 
+    public void RemoveTags(Guid id, List<string> tags)
+    {
+        _fileService.RemoveTags(id, tags);
+    }
+
     public void RemoveTags(string file, List<string> tags)
     {
         var fileRecords = _searchService.SearchByName(file);
@@ -80,6 +113,11 @@ public class PAMSCoreAPI
         {
             _fileService.RemoveTags(fileRecord.Id, tags);
         }
+    }
+
+    public void DeleteFile(Guid id)
+    {
+        _fileService.DeleteFile(id);
     }
 
     public void DeleteFile(string file)

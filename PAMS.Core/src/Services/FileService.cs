@@ -130,6 +130,17 @@ public class FileService
         _metadata.Remove(id);
         _metadata.Add(record);
     }
+    
+    public void ChangeDescription(Guid id, string newDescription)
+    {
+        var record = _metadata.Get(id);
+        if (record == null) throw new Exception("File record not found");
+
+        record.Description = newDescription;
+
+        _metadata.Remove(id);
+        _metadata.Add(record);
+    }
 
     public void ChangePrimaryTag(Guid id, string newPrimaryTag)
     {
@@ -216,7 +227,6 @@ public class FileService
         _metadata.Remove(id);
         _metadata.Add(record);
     }
-
 
     public void DeleteFile(Guid id)
     {
