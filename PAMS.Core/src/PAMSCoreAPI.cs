@@ -129,6 +129,20 @@ public class PAMSCoreAPI
         }
     }
 
+    public void DeleteMetadataOnly(Guid id)
+    {
+        _fileService.DeleteMetadataOnly(id);
+    }
+
+    public void DeleteMetadataOnly(string file)
+    {
+        var fileRecords = _searchService.SearchByName(file);
+        foreach (var fileRecord in fileRecords)
+        {
+            _fileService.DeleteMetadataOnly(fileRecord.Id);
+        }
+    }
+
     public List<FileRecord> SearchByName(string keyword) => _searchService.SearchByName(keyword);
 
     public List<FileRecord> SearchByTags(List<string> tags) => _searchService.SearchByTags(tags);

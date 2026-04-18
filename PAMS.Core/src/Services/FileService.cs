@@ -248,4 +248,18 @@ public class FileService
 
         _tagIndex.Remove(id);
     }
+
+    public void DeleteMetadataOnly(Guid id)
+    {
+        var record = _metadata.Get(id);
+
+        if (record == null)
+            return;
+
+        _metadata.Remove(id);
+
+        _hashIndex.Remove(record.Hash);
+
+        _tagIndex.Remove(id);
+    }
 }
