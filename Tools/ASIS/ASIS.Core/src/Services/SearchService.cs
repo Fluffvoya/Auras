@@ -49,4 +49,15 @@ public class SearchService
             .Where(f => f != null)
             .ToList();
     }
+
+    public List<FileRecord> SearchByTime(DateTime start, DateTime end)
+    {
+        if (start > end)
+            return new();
+
+        return _metadata
+            .GetAll()
+            .Where(f => f.CreatedTime >= start && f.CreatedTime <= end)
+            .ToList();
+    }
 }

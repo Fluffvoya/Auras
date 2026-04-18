@@ -146,4 +146,6 @@ public class PAMSCoreAPI
     public List<FileRecord> SearchByName(string keyword) => _searchService.SearchByName(keyword);
 
     public List<FileRecord> SearchByTags(List<string> tags) => _searchService.SearchByTags(tags);
+
+    public List<FileRecord> SearchByTime(DateTime start, DateTime end) => _searchService.SearchByTime(start, end);
 }

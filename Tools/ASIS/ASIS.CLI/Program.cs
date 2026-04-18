@@ -265,7 +265,7 @@ class Program
         if (!RequireArchive()) return true;
         if (commands.Count < 3)
         {
-            Console.WriteLine("Usage: search --name <keyword> OR search --tag <tag1,tag2>");
+            Console.WriteLine("Usage: search --name <keyword> | search --tag <tag1,tag2> | search --time <start> <end>");
             return true;
         }
 
@@ -281,9 +281,27 @@ class Program
                 var tags = ParseTags(commands[2]);
                 results = _api.SearchByTags(tags);
             }
+            else if (commands[1] == "--time")
+            {
+                if (commands.Count < 4)
+                {
+                    Console.WriteLine("Usage: search --time <start> <end>  (date format: yyyy-MM-dd)");
+                    return true;
+                }
+
+                DateTime start, end;
+                if (!DateTime.TryParse(commands[2], out start) || !DateTime.TryParse(commands[3], out end))
+                {
+                    Console.WriteLine("Error: Invalid date format. Use yyyy-MM-dd (e.g. 2025-01-01).");
+                    return true;
+                }
+
+                end = end.Date.AddDays(1).AddTicks(-1);
+                results = _api.SearchByTime(start, end);
+            }
             else
             {
-                Console.WriteLine("Error: Search type must be '--name' or '--tag'.");
+                Console.WriteLine("Error: Search type must be '--name', '--tag', or '--time'.");
                 return true;
             }
 
