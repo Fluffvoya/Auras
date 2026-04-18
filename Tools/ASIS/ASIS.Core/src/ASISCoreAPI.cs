@@ -4,7 +4,7 @@ using ASIS.Core.Services;
 
 namespace ASIS.Core;
 
-public class PAMSCoreAPI
+public class ASISCoreAPI
 {
     private readonly FileService _fileService;
 
@@ -14,7 +14,7 @@ public class PAMSCoreAPI
 
     private readonly ConfigService _configService;
 
-    public PAMSCoreAPI(string configFile, string archiveRoot)
+    public ASISCoreAPI(string configFile, string archiveRoot)
     {
         var configRepo = new ConfigRepository(configFile);
 

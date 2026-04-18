@@ -7,7 +7,7 @@ namespace ASIS.CLI;
 
 class Program
 {
-    private static PAMSCoreAPI? _api;
+    private static ASISCoreAPI? _api;
 
     static void Main(string[] args)
     {
@@ -102,7 +102,7 @@ class Program
         {
             string fileDir = Path.Combine(path, "archive.json");
             if (!File.Exists(fileDir)) return true;
-            _api = new PAMSCoreAPI(
+            _api = new ASISCoreAPI(
                 Path.Combine(
                     Environment.GetFolderPath(
                         Environment.SpecialFolder.LocalApplicationData)
