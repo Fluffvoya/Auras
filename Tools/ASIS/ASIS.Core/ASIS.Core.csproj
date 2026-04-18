@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <AssemblyName>pams</AssemblyName>
+        <OutputType>Library</OutputType>
+        <AssemblyName>asis-core</AssemblyName>
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>ASIS.Core</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\PAMS.Core\PAMS.Core.csproj" />
+        <Folder Include="bin\"/>
     </ItemGroup>
 
 </Project>

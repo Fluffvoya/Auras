@@ -1,6 +1,6 @@
-﻿using PAMS.Core.Repositories;
+﻿using ASIS.Core.Repositories;
 
-namespace PAMS.Core.Services;
+namespace ASIS.Core.Services;
 
 public class ConfigService
 {

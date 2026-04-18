@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
-using PAMS.Core.Models;
-using PAMS.Core.Storage;
+using ASIS.Core.Models;
+using ASIS.Core.Storage;
 
-namespace PAMS.Core.Repositories;
+namespace ASIS.Core.Repositories;
 
 public class MetadataRepository
 {

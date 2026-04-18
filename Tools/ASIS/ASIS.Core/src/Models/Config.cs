@@ -1,4 +1,4 @@
-﻿namespace PAMS.Core.Models;
+﻿namespace ASIS.Core.Models;
 
 public class Config
 {

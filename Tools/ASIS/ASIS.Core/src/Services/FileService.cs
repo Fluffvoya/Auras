@@ -1,8 +1,8 @@
-﻿using PAMS.Core.Models;
-using PAMS.Core.Repositories;
-using PAMS.Core.Utils;
+﻿using ASIS.Core.Models;
+using ASIS.Core.Repositories;
+using ASIS.Core.Utils;
 
-namespace PAMS.Core.Services;
+namespace ASIS.Core.Services;
 
 public class FileService
 {

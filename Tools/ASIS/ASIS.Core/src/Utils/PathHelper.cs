@@ -1,4 +1,4 @@
-﻿namespace PAMS.Core.Utils;
+﻿namespace ASIS.Core.Utils;
 
 public static class PathHelper
 {

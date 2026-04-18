@@ -1,9 +1,9 @@
 ﻿using System.Text;
-using PAMS.Core;
-using PAMS.Core.Models;
-using PAMS.Core.Storage;
+using ASIS.Core;
+using ASIS.Core.Models;
+using ASIS.Core.Storage;
 
-namespace PAMS.CLI;
+namespace ASIS.CLI;
 
 class Program
 {

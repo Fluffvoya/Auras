@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace PAMS.Core.Storage;
+namespace ASIS.Core.Storage;
 
 public static class JsonStorage
 {

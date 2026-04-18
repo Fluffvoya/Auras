@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PAMS.Core", "PAMS.Core\PAMS.Core.csproj", "{2918E9CC-4BDE-4A9A-AF40-AD01E8BBCDA6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASIS.Core", "Tools\ASIS\ASIS.Core\ASIS.Core.csproj", "{2918E9CC-4BDE-4A9A-AF40-AD01E8BBCDA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PAMS.CLI", "PAMS.CLI\PAMS.CLI.csproj", "{EA65F9CB-5D24-49A6-9B00-6D6CF4C7CE2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASIS.CLI", "Tools\ASIS\ASIS.CLI\ASIS.CLI.csproj", "{EA65F9CB-5D24-49A6-9B00-6D6CF4C7CE2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

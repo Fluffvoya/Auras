@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace PAMS.Core.Repositories;
+namespace ASIS.Core.Repositories;
 
 public class HashIndexRepository
 {

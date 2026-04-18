@@ -1,7 +1,7 @@
-﻿using PAMS.Core.Models;
-using PAMS.Core.Repositories;
+﻿using ASIS.Core.Models;
+using ASIS.Core.Repositories;
 
-namespace PAMS.Core.Services;
+namespace ASIS.Core.Services;
 
 public class ArchiveConfigService
 {

@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using PAMS.Core.Models;
+using ASIS.Core.Models;
 
-namespace PAMS.Core.Repositories;
+namespace ASIS.Core.Repositories;
 
 public class ArchiveConfigRepository
 {

@@ -1,8 +1,8 @@
-﻿using PAMS.Core.Models;
-using PAMS.Core.Repositories;
-using PAMS.Core.Services;
+﻿using ASIS.Core.Models;
+using ASIS.Core.Repositories;
+using ASIS.Core.Services;
 
-namespace PAMS.Core;
+namespace ASIS.Core;
 
 public class PAMSCoreAPI
 {
