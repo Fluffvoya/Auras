@@ -58,6 +58,7 @@ class Program
             }
             case "close": return Close();
             case "import": return Import(commands);
+            case "add": return AddFile(commands);
             case "rename": return Rename(commands);
             case "retag": return ChangePrimaryTag(commands);
             case "addtag": return AddTags(commands);
@@ -171,6 +172,13 @@ class Program
         }
 
         return true;
+    }
+
+    static bool AddFile(List<string> commands)
+    {
+        commands[0] = "import";
+        commands.Add("--move");
+        return Import(commands);
     }
 
     static bool Rename(List<string> commands)
