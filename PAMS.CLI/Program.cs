@@ -63,6 +63,7 @@ class Program
             case "addtag": return AddTags(commands);
             case "rmtag": return RemoveTags(commands);
             case "delete": return DeleteFile(commands);
+            case "unlink": return Unlink(commands);
             case "search": return Search(commands);
             case "exit": return false;
             default:
@@ -242,6 +243,20 @@ class Program
 
         _api.DeleteFile(commands[1]);
         Console.WriteLine("File deleted successfully.");
+        return true;
+    }
+
+    static bool Unlink(List<string> commands)
+    {
+        if (!RequireArchive()) return true;
+        if (commands.Count < 2)
+        {
+            Console.WriteLine("Usage: unlink <file_keyword>");
+            return true;
+        }
+
+        _api.DeleteMetadataOnly(commands[1]);
+        Console.WriteLine("File metadata removed successfully.");
         return true;
     }
 
