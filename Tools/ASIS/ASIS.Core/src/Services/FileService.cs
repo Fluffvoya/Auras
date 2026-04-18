@@ -109,14 +109,6 @@ public class FileService
             throw new IOException("A file with the same name already exists in the target directory.");
         }
 
-        var newHash = HashHelper.ComputeSHA256(newPath);
-
-        if (_hashIndex.Exists(newHash))
-        {
-            throw new Exception("Duplicate file detected based on the new file content hash");
-        }
-
-        // 当一切都判断无误后再移动文件并修改元数据
         if (!File.Exists(oldPath))
         {
             throw new FileNotFoundException("File not found", oldPath);
@@ -158,7 +150,7 @@ public class FileService
         }
 
         // 创建新目录并移动物理文件
-        if (Directory.Exists(newDir))
+        if (!Directory.Exists(newDir))
         {
             Directory.CreateDirectory(newDir);
         }
