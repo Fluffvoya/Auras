@@ -143,7 +143,8 @@ class Program
         if (!RequireArchive()) return true;
         if (commands.Count < 3)
         {
-            Console.WriteLine("Usage: import <source_path> <primary_tag> [tag1,tag2] [--desc \"description\"] [--move]");
+            Console.WriteLine(
+                "Usage: import <source_path> <primary_tag> [tag1,tag2] [--desc \"description\"] [--move]");
             return true;
         }
 
@@ -273,7 +274,8 @@ class Program
         if (!RequireArchive()) return true;
         if (commands.Count < 3)
         {
-            Console.WriteLine("Usage: search --name <keyword> | search --tag <tag1,tag2> | search --time <start> <end>");
+            Console.WriteLine(
+                "Usage: search --name <keyword> | search --tag <tag1,tag2> | search --time <start> <end>");
             return true;
         }
 
