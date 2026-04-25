@@ -1,272 +1,112 @@
-# ASIS.CLI - Usage Guide
+# ASIS.CLI
 
-**Assembly**: `asis`
-**Entry Point**: `Tools/ASIS/ASIS.CLI/Program.cs`
-**Framework**: .NET 10.0
+A Read-Eval-Print Loop (REPL) for archive management via `ASISCoreAPI`.
 
-ASIS.CLI is an interactive command-line shell for archive management. It wraps `ASISCoreAPI` with a Read-Eval-Print Loop (REPL).
-
----
-
-## Getting Started
-
-### Build
+## Build & Run
 
 ```bash
-cd Tools/ASIS/ASIS.CLI
-dotnet build
-```
-
-### Run
-
-```bash
-dotnet run
-```
-
-The CLI starts a prompt loop:
-
-```
-> _
-[archive_name] > _
-```
-
-Commands are entered interactively. Use `exit` to quit.
-
----
-
-## Archive Management
-
-### create
-
-Create a new archive directory with `archive.json`.
-
-```
-create <archive_name> [path]
-```
-
-- `archive_name` — name of the archive
-- `path` — optional root path (defaults to `./`)
-
-```
-create my_archive
-create my_archive /path/to/parent
-```
-
-### open
-
-Open an existing archive for subsequent commands.
-
-```
-open <path>
+dotnet build Tools/ASIS/ASIS.CLI
+dotnet run --project Tools/ASIS/ASIS.CLI
 ```
 
 ```
-open ./my_archive
-open /absolute/path/to/archive
+> create my_archive
+[my_archive] > import ./photo.jpg vacation
+[my_archive] > exit
 ```
 
-### close
+## File Identifier
 
-Close the currently open archive.
+All file operations accept a `<file>` argument:
+
+| Format | Example | Behavior |
+|--------|---------|----------|
+| Substring | `vacation_photo` | Matches first file with name containing substring |
+| Exact ID | `id:a1b2c3d4-...` | Matches by exact GUID |
+
+When multiple files match a substring, use `id:<guid>` for exact matching.
+
+## Archive
 
 ```
-close
+create <name> [path]   # Create archive directory (default path: ./)
+open <path>            # Open existing archive
+close                  # Close current archive
+archive                # Show archive info
 ```
-
----
 
 ## File Operations
 
 All file operations require an open archive.
 
-### import
-
-Import a file into the archive (copied by default).
-
 ```
-import <source_path> <primary_tag> [tag1,tag2] [--desc "description"] [--move]
+import <path> <primary_tag> [tags] [--desc "text"] [--move]
+    # Copy file into archive (--move to move instead)
+    # Example: import ./photo.jpg vacation summer,beach --desc "Hawaii trip"
+
+rename <file> <new_name>
+    # Example: rename vacation_photo vacation_backup.jpg
+
+retag <file> <new_primary_tag>
+    # Example: retag vacation_photo travel
+
+tag add <file> <tag1,tag2,...>
+    # Example: tag add vacation_photo summer,2024
+
+tag remove <file> <tag1,tag2,...>
+    # Example: tag remove vacation_photo summer
+
+tag list <file>
+    # Example: tag list vacation_photo
+    # Output:
+    #   File: vacation_photo.jpg
+    #   PrimaryTag: vacation
+    #   Tags: [summer, 2024, beach]
+
+info <file>
+    # Shows: ID, Name, PrimaryTag, Tags, Description, Hash, Path, Created
+
+describe <file> <description>
+    # Use empty string "" to clear description
+
+delete <file>        # Delete physical file and metadata
+unlink <file>        # Remove metadata only (keep physical file)
 ```
-
-- `source_path` — path to the source file
-- `primary_tag` — required primary tag
-- `tag1,tag2` — optional additional tags (comma-separated)
-- `--desc` — optional description text
-- `--move` — move the file instead of copying
-
-```
-import ./photo.jpg vacation
-import ./doc.pdf work --desc "Q1 report"
-import ./data.zip archive --move
-```
-
-### add
-
-Shortcut for `import --move` (always moves the file).
-
-```
-add <source_path> <primary_tag> [tags]
-```
-
-```
-add ./file.zip archived
-```
-
-### rename
-
-Rename a file in the archive.
-
-```
-rename <file_keyword> <new_name>
-```
-
-- `file_keyword` — substring match against existing file name
-
-```
-rename photo vacation_backup.jpg
-```
-
-### retag
-
-Change the primary tag of a file.
-
-```
-retag <file_keyword> <new_primary_tag>
-```
-
-```
-retag photo_vacation new_category
-```
-
-### addtag
-
-Add tags to a file.
-
-```
-addtag <file_keyword> <tag1,tag2>
-```
-
-```
-addtag photo_vacation summer,2024
-```
-
-### rmtag
-
-Remove tags from a file.
-
-```
-rmtag <file_keyword> <tag1,tag2>
-```
-
-```
-rmtag photo_vacation summer
-```
-
-### delete
-
-Delete both the physical file and its metadata.
-
-```
-delete <file_keyword>
-```
-
-```
-delete old_file
-```
-
-### unlink
-
-Remove metadata only (unlink the file from the archive without deleting the physical file).
-
-```
-unlink <file_keyword>
-```
-
-```
-unlink duplicated_file
-```
-
----
 
 ## Search
 
-### search
-
-Search for files by name, tags, or time range.
-
 ```
-search --name <keyword>
-search --tag <tag1,tag2>
-search --time <start> <end>
-```
+search name <keyword>                   # substring match on name
+search tag <tag1,tag2,...>              # file must have ALL tags
+search time <yyyy-MM-dd> <yyyy-MM-dd>   # date range
 
-- `--name` — substring match on file name
-- `--tag` — intersection match (file must have ALL tags)
-- `--time` — date range (format: `yyyy-MM-dd`)
-
-```
-search --name photo
-search --tag vacation,summer
-search --time 2025-01-01 2025-12-31
+id <guid> [--full]                      # lookup by GUID (--full for details)
+diff                                     # show orphaned metadata / untracked files
 ```
 
-Output format:
-
+Example search output:
 ```
- - ID: <guid> | Name: <name> | PrimaryTag: <tag> | Tags: [<tags>] | Description: <desc>
-```
+──────────────────────────────────────────────────────
+  Found 2 file(s):
+──────────────────────────────────────────────────────
+  [a1b2c3d4-...]
+    Name:       vacation_photo.jpg
+    PrimaryTag: vacation
+    Tags:       [summer, beach]
+    Desc:       Hawaii trip
 
----
-
-## Maintenance
-
-### diff
-
-Check for orphaned metadata and untracked files in the archive.
-
-```
-diff
-```
-
-- **Orphaned metadata** — records in `metadata.json` without a corresponding physical file
-- **Untracked files** — physical files not recorded in `metadata.json`
-
-```
-diff
+  [e5f6a1b2-...]
+    Name:       vacation_map.png
+    PrimaryTag: travel
+    Tags:       [map]
 ```
 
----
+## Help & Exit
 
-## Error Handling
+```
+help              # list all commands
+help <command>    # help for specific command
+exit              # quit CLI
+```
 
-Errors are printed to stderr:
-
-| Message | Meaning |
-|---------|---------|
-| `Unknown command: <cmd>` | Unrecognized command |
-| `No archive open. Use 'open <path>' first.` | No archive loaded |
-| `Import failed: <reason>` | File import error |
-| `Search failed: <reason>` | Search operation error |
-| `Diff failed: <reason>` | Diff operation error |
-
----
-
-## Command Summary
-
-| Command | Description |
-|---------|-------------|
-| `create <name> [path]` | Create new archive |
-| `open <path>` | Open existing archive |
-| `close` | Close current archive |
-| `import <path> <tag> [tags] [--move]` | Import file (copy) |
-| `add <path> <tag> [tags]` | Import file (move) |
-| `rename <keyword> <name>` | Rename file |
-| `retag <keyword> <tag>` | Change primary tag |
-| `addtag <keyword> <tags>` | Add tags |
-| `rmtag <keyword> <tags>` | Remove tags |
-| `delete <keyword>` | Delete file and metadata |
-| `unlink <keyword>` | Remove metadata only |
-| `search --name <kw>` | Search by name |
-| `search --tag <tags>` | Search by tags |
-| `search --time <start> <end>` | Search by date range |
-| `diff` | Check archive consistency |
-| `exit` | Exit CLI |
+Errors are printed in red to stderr.
