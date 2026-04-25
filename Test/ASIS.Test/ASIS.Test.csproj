@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\AuraError\AuraError.csproj" />
       <ProjectReference Include="..\..\Tools\ASIS\ASIS.Core\ASIS.Core.csproj" />
     </ItemGroup>
 

@@ -70,7 +70,7 @@ class Program
             case "exit": return false;
             default:
             {
-                Console.WriteLine($"Can not identify command:{commands[0]}");
+                ConsoleWriter.Err($"Unknown command: {commands[0]}");
                 break;
             }
         }
@@ -83,7 +83,7 @@ class Program
         string archiveRoot = Path.Combine(path, archive);
         if (Path.Exists(archiveRoot))
         {
-            Console.WriteLine($"{archiveRoot} already exists");
+            ConsoleWriter.Warn($"Archive '{archive}' already exists at {path}");
             return true;
         }
 
@@ -120,7 +120,7 @@ class Program
     {
         if (_api == null)
         {
-            Console.WriteLine("Error: Please open an archive first. (use 'open <path>')");
+            ConsoleWriter.Err("No archive open. Use 'open <path>' first.");
             return false;
         }
 
@@ -139,8 +139,7 @@ class Program
         if (!RequireArchive()) return true;
         if (commands.Count < 3)
         {
-            Console.WriteLine(
-                "Usage: import <source_path> <primary_tag> [tag1,tag2] [--desc \"description\"] [--move]");
+            ConsoleWriter.Info("Usage: import <source_path> <primary_tag> [tag1,tag2] [--desc \"description\"] [--move]");
             return true;
         }
 
@@ -161,11 +160,11 @@ class Program
         try
         {
             var record = _api.ImportFile(sourcePath, primaryTag, tags, description, move);
-            Console.WriteLine($"Successfully imported: {record.Name} (ID: {record.Id})");
+            ConsoleWriter.Ok($"Imported: {record.Name} ({record.Id})");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Import failed: {ex.Message}");
+            ConsoleWriter.Err($"Import failed: {ex.Message}");
         }
 
         return true;
@@ -183,12 +182,12 @@ class Program
         if (!RequireArchive()) return true;
         if (commands.Count < 3)
         {
-            Console.WriteLine("Usage: rename <file_keyword> <new_name>");
+            ConsoleWriter.Info("Usage: rename <file_keyword> <new_name>");
             return true;
         }
 
         _api.ChangeFileName(commands[1], commands[2]);
-        Console.WriteLine("File name changed successfully.");
+        ConsoleWriter.Ok("File renamed.");
         return true;
     }
 
@@ -198,12 +197,12 @@ class Program
         // 用法: retag <file_keyword> <new_primary_tag>
         if (commands.Count < 3)
         {
-            Console.WriteLine("Usage: retag <file_keyword> <new_primary_tag>");
+            ConsoleWriter.Info("Usage: retag <file_keyword> <new_primary_tag>");
             return true;
         }
 
         _api.ChangePrimaryTag(commands[1], commands[2]);
-        Console.WriteLine("Primary tag changed successfully.");
+        ConsoleWriter.Ok("Primary tag updated.");
         return true;
     }
 
@@ -212,13 +211,13 @@ class Program
         if (!RequireArchive()) return true;
         if (commands.Count < 3)
         {
-            Console.WriteLine("Usage: addtag <file_keyword> <tag1,tag2,tag3>");
+            ConsoleWriter.Info("Usage: addtag <file_keyword> <tag1,tag2,tag3>");
             return true;
         }
 
         var tags = ParseTags(commands[2]);
         _api.AddTags(commands[1], tags);
-        Console.WriteLine($"Tags [{string.Join(", ", tags)}] added successfully.");
+        ConsoleWriter.Ok($"Tags added: {string.Join(", ", tags)}");
         return true;
     }
 
@@ -227,13 +226,13 @@ class Program
         if (!RequireArchive()) return true;
         if (commands.Count < 3)
         {
-            Console.WriteLine("Usage: rmtag <file_keyword> <tag1,tag2>");
+            ConsoleWriter.Info("Usage: rmtag <file_keyword> <tag1,tag2>");
             return true;
         }
 
         var tags = ParseTags(commands[2]);
         _api.RemoveTags(commands[1], tags);
-        Console.WriteLine($"Tags [{string.Join(", ", tags)}] removed successfully.");
+        ConsoleWriter.Ok($"Tags removed: {string.Join(", ", tags)}");
         return true;
     }
 
@@ -242,12 +241,12 @@ class Program
         if (!RequireArchive()) return true;
         if (commands.Count < 2)
         {
-            Console.WriteLine("Usage: delete <file_keyword>");
+            ConsoleWriter.Info("Usage: delete <file_keyword>");
             return true;
         }
 
         _api.DeleteFile(commands[1]);
-        Console.WriteLine("File deleted successfully.");
+        ConsoleWriter.Ok("File deleted.");
         return true;
     }
 
@@ -256,12 +255,12 @@ class Program
         if (!RequireArchive()) return true;
         if (commands.Count < 2)
         {
-            Console.WriteLine("Usage: unlink <file_keyword>");
+            ConsoleWriter.Info("Usage: unlink <file_keyword>");
             return true;
         }
 
         _api.DeleteMetadataOnly(commands[1]);
-        Console.WriteLine("File metadata removed successfully.");
+        ConsoleWriter.Ok("Metadata removed.");
         return true;
     }
 
@@ -270,8 +269,7 @@ class Program
         if (!RequireArchive()) return true;
         if (commands.Count < 3)
         {
-            Console.WriteLine(
-                "Usage: search --name <keyword> | search --tag <tag1,tag2> | search --time <start> <end>");
+            ConsoleWriter.Info("Usage: search --name <keyword> | search --tag <tag1,tag2> | search --time <start> <end>");
             return true;
         }
 
@@ -291,14 +289,14 @@ class Program
             {
                 if (commands.Count < 4)
                 {
-                    Console.WriteLine("Usage: search --time <start> <end>  (date format: yyyy-MM-dd)");
+                    ConsoleWriter.Info("Usage: search --time <start> <end> (format: yyyy-MM-dd)");
                     return true;
                 }
 
                 DateTime start, end;
                 if (!DateTime.TryParse(commands[2], out start) || !DateTime.TryParse(commands[3], out end))
                 {
-                    Console.WriteLine("Error: Invalid date format. Use yyyy-MM-dd (e.g. 2025-01-01).");
+                    ConsoleWriter.Err("Invalid date format. Use yyyy-MM-dd (e.g. 2025-01-01).");
                     return true;
                 }
 
@@ -307,17 +305,17 @@ class Program
             }
             else
             {
-                Console.WriteLine("Error: Search type must be '--name', '--tag', or '--time'.");
+                ConsoleWriter.Err("Search type must be '--name', '--tag', or '--time'.");
                 return true;
             }
 
             if (results.Count == 0)
             {
-                Console.WriteLine("No matching files found.");
+                ConsoleWriter.Warn("No matching files found.");
             }
             else
             {
-                Console.WriteLine($"Found {results.Count} file(s):");
+                ConsoleWriter.Ok($"Found {results.Count} file(s)");
                 foreach (var r in results)
                 {
                     Console.WriteLine(
@@ -327,7 +325,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Search failed: {ex.Message}");
+            ConsoleWriter.Err($"Search failed: {ex.Message}");
         }
 
         return true;
@@ -343,13 +341,13 @@ class Program
 
             if (result.OrphanedMetadata.Count == 0 && result.OrphanedDiskFiles.Count == 0)
             {
-                Console.WriteLine("No differences found. Metadata and disk are in sync.");
+                ConsoleWriter.Ok("No differences found. Metadata and disk are in sync.");
                 return true;
             }
 
             if (result.OrphanedMetadata.Count > 0)
             {
-                Console.WriteLine($"Metadata records with no corresponding disk file ({result.OrphanedMetadata.Count}):");
+                ConsoleWriter.Warn($"Orphaned metadata ({result.OrphanedMetadata.Count}):");
                 foreach (var record in result.OrphanedMetadata)
                 {
                     Console.WriteLine($" - {record.RelativePath} (ID: {record.Id})");
@@ -358,7 +356,7 @@ class Program
 
             if (result.OrphanedDiskFiles.Count > 0)
             {
-                Console.WriteLine($"Disk files with no corresponding metadata record ({result.OrphanedDiskFiles.Count}):");
+                ConsoleWriter.Warn($"Untracked disk files ({result.OrphanedDiskFiles.Count}):");
                 foreach (var path in result.OrphanedDiskFiles)
                 {
                     Console.WriteLine($" - {path}");
@@ -367,7 +365,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Diff failed: {ex.Message}");
+            ConsoleWriter.Err($"Diff failed: {ex.Message}");
         }
 
         return true;
