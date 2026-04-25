@@ -1,6 +1,7 @@
 using ASIS.Core.Models;
 using ASIS.Core.Repositories;
 using ASIS.Core.Services;
+using AuraError.Exceptions;
 
 namespace ASIS.Test;
 
@@ -89,7 +90,7 @@ public class FileServiceTests : IDisposable
         _fileService.ImportFile(source1, "doc", new List<string> { "doc" });
 
         var source2 = CreateSourceFile("file2.txt", content);
-        Assert.Throws<Exception>(() => _fileService.ImportFile(source2, "doc", new List<string> { "doc" }));
+        Assert.Throws<DuplicateFileException>(() => _fileService.ImportFile(source2, "doc", new List<string> { "doc" }));
     }
 
     [Fact]
@@ -122,20 +123,20 @@ public class FileServiceTests : IDisposable
     public void ChangeFileName_EmptyName_ThrowsArgumentException()
     {
         var record = ImportTestFile("test.txt", "doc", new List<string> { "doc" }, "unique2");
-        Assert.Throws<ArgumentException>(() => _fileService.ChangeFileName(record.Id, ""));
+        Assert.Throws<ValidationException>(() => _fileService.ChangeFileName(record.Id, ""));
     }
 
     [Fact]
     public void ChangeFileName_InvalidChars_ThrowsArgumentException()
     {
         var record = ImportTestFile("test.txt", "doc", new List<string> { "doc" }, "unique3");
-        Assert.Throws<ArgumentException>(() => _fileService.ChangeFileName(record.Id, "bad|name.txt"));
+        Assert.Throws<ValidationException>(() => _fileService.ChangeFileName(record.Id, "bad|name.txt"));
     }
 
     [Fact]
     public void ChangeFileName_NonexistentId_Throws()
     {
-        Assert.Throws<Exception>(() => _fileService.ChangeFileName(Guid.NewGuid(), "new.txt"));
+        Assert.Throws<FileRecordNotFoundException>(() => _fileService.ChangeFileName(Guid.NewGuid(), "new.txt"));
     }
 
     // --- ChangeDescription ---
@@ -153,7 +154,7 @@ public class FileServiceTests : IDisposable
     [Fact]
     public void ChangeDescription_NonexistentId_Throws()
     {
-        Assert.Throws<Exception>(() => _fileService.ChangeDescription(Guid.NewGuid(), "desc"));
+        Assert.Throws<FileRecordNotFoundException>(() => _fileService.ChangeDescription(Guid.NewGuid(), "desc"));
     }
 
     // --- ChangePrimaryTag ---
@@ -174,7 +175,7 @@ public class FileServiceTests : IDisposable
     [Fact]
     public void ChangePrimaryTag_NonexistentId_Throws()
     {
-        Assert.Throws<Exception>(() => _fileService.ChangePrimaryTag(Guid.NewGuid(), "newTag"));
+        Assert.Throws<FileRecordNotFoundException>(() => _fileService.ChangePrimaryTag(Guid.NewGuid(), "newTag"));
     }
 
     // --- AddTags ---
@@ -204,7 +205,7 @@ public class FileServiceTests : IDisposable
     [Fact]
     public void AddTags_NonexistentId_Throws()
     {
-        Assert.Throws<Exception>(() => _fileService.AddTags(Guid.NewGuid(), new List<string> { "tag" }));
+        Assert.Throws<FileRecordNotFoundException>(() => _fileService.AddTags(Guid.NewGuid(), new List<string> { "tag" }));
     }
 
     // --- RemoveTags ---
@@ -223,13 +224,13 @@ public class FileServiceTests : IDisposable
     public void RemoveTags_PrimaryTag_ThrowsInvalidOperationException()
     {
         var record = ImportTestFile("ptag.txt", "photo", new List<string> { "photo" }, "unique9");
-        Assert.Throws<InvalidOperationException>(() => _fileService.RemoveTags(record.Id, new List<string> { "photo" }));
+        Assert.Throws<InvalidTagOperationException>(() => _fileService.RemoveTags(record.Id, new List<string> { "photo" }));
     }
 
     [Fact]
     public void RemoveTags_NonexistentId_Throws()
     {
-        Assert.Throws<Exception>(() => _fileService.RemoveTags(Guid.NewGuid(), new List<string> { "tag" }));
+        Assert.Throws<FileRecordNotFoundException>(() => _fileService.RemoveTags(Guid.NewGuid(), new List<string> { "tag" }));
     }
 
     // --- DeleteFile ---

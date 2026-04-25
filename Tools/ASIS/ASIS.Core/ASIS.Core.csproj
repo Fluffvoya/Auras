@@ -13,4 +13,8 @@
         <Folder Include="bin\"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\AuraError\AuraError.csproj" />
+    </ItemGroup>
+
 </Project>

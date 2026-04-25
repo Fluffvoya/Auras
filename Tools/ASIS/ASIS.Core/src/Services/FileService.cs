@@ -1,6 +1,7 @@
 ﻿using ASIS.Core.Models;
 using ASIS.Core.Repositories;
 using ASIS.Core.Utils;
+using AuraError.Exceptions;
 
 namespace ASIS.Core.Services;
 
@@ -36,7 +37,7 @@ public class FileService
         var hash = HashHelper.ComputeSHA256(sourcePath);
 
         if (_hashIndex.Exists(hash))
-            throw new Exception("Duplicate file detected");
+            throw new DuplicateFileException(hash);
 
         var fileName = Path.GetFileName(sourcePath);
 
@@ -78,18 +79,18 @@ public class FileService
     {
         if (string.IsNullOrWhiteSpace(newFileName))
         {
-            throw new ArgumentException("File name cannot be empty.", nameof(newFileName));
+            throw new ValidationException("File name cannot be empty.", nameof(newFileName));
         }
 
         if (newFileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
         {
-            throw new ArgumentException(
+            throw new ValidationException(
                 $"File name contains invalid characters. Allowed characters exclude: {string.Join(", ", Path.GetInvalidFileNameChars())}",
                 nameof(newFileName));
         }
 
         var record = _metadata.Get(id);
-        if (record == null) throw new Exception("File record not found");
+        if (record == null) throw new FileRecordNotFoundException(id);
 
         var rootDir = _archiveConfig.ArchivePath ?? "";
         var oldPath = Path.Combine(rootDir, record.RelativePath);
@@ -97,17 +98,17 @@ public class FileService
 
         if (newPath == oldPath)
         {
-            throw new IOException("A file with the same name already exists in the target directory.");
+            throw new FileNameConflictException(newPath);
         }
 
         if (File.Exists(newPath))
         {
-            throw new IOException("A file with the same name already exists in the target directory.");
+            throw new FileNameConflictException(newPath);
         }
 
         if (!File.Exists(oldPath))
         {
-            throw new FileNotFoundException("File not found", oldPath);
+            throw new PhysicalFileNotFoundException(oldPath);
         }
 
         File.Move(oldPath, newPath);
@@ -122,7 +123,7 @@ public class FileService
     public void ChangeDescription(Guid id, string newDescription)
     {
         var record = _metadata.Get(id);
-        if (record == null) throw new Exception("File record not found");
+        if (record == null) throw new FileRecordNotFoundException(id);
 
         record.Description = newDescription;
 
@@ -133,7 +134,7 @@ public class FileService
     public void ChangePrimaryTag(Guid id, string newPrimaryTag)
     {
         var record = _metadata.Get(id);
-        if (record == null) throw new Exception("File record not found");
+        if (record == null) throw new FileRecordNotFoundException(id);
 
         var rootDir = _archiveConfig.ArchivePath ?? "";
         var oldPath = Path.Combine(rootDir, record.RelativePath);
@@ -142,7 +143,7 @@ public class FileService
 
         if (newPath == oldPath)
         {
-            throw new IOException("A file with the same name already exists in the target directory.");
+            throw new FileNameConflictException(newPath);
         }
 
         // 创建新目录并移动物理文件
@@ -153,7 +154,7 @@ public class FileService
 
         if (!File.Exists(oldPath))
         {
-            throw new FileNotFoundException("File not found", oldPath);
+            throw new PhysicalFileNotFoundException(oldPath);
         }
 
         File.Move(oldPath, newPath);
@@ -179,7 +180,7 @@ public class FileService
     public void AddTags(Guid id, List<string> tags)
     {
         var record = _metadata.Get(id);
-        if (record == null) throw new Exception("File record not found");
+        if (record == null) throw new FileRecordNotFoundException(id);
 
         // 将新标签合并到记录中（去重）
         foreach (var tag in tags)
@@ -200,11 +201,11 @@ public class FileService
     public void RemoveTags(Guid id, List<string> tags)
     {
         var record = _metadata.Get(id);
-        if (record == null) throw new Exception("File record not found");
+        if (record == null) throw new FileRecordNotFoundException(id);
 
         if (tags.Contains(record.PrimaryTag))
         {
-            throw new InvalidOperationException("Cannot remove the primary tag.");
+            throw new InvalidTagOperationException("remove", record.PrimaryTag);
         }
 
         record.Tags.RemoveAll(t => tags.Contains(t));
