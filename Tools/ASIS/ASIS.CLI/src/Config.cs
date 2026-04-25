@@ -1,4 +1,4 @@
-﻿namespace ASIS.Core.Models;
+namespace ASIS.CLI.Models;
 
 public class Config
 {

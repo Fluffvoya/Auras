@@ -14,20 +14,16 @@ public class FileService
 
     private readonly ArchiveConfigRepository _archiveConfig;
 
-    private readonly ConfigRepository _configRepository;
-
     public FileService(
         MetadataRepository metadata,
         TagIndexRepository tagIndex,
         HashIndexRepository hashIndex,
-        ArchiveConfigRepository archiveConfig,
-        ConfigRepository configRepository)
+        ArchiveConfigRepository archiveConfig)
     {
         _metadata = metadata;
         _tagIndex = tagIndex;
         _hashIndex = hashIndex;
         _archiveConfig = archiveConfig;
-        _configRepository = configRepository;
     }
 
     public FileRecord ImportFile(

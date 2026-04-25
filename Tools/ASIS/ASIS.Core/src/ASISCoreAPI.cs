@@ -12,14 +12,10 @@ public class ASISCoreAPI
 
     private readonly ArchiveConfigService _archiveConfigService;
 
-    private readonly ConfigService _configService;
-
     private readonly ArchiveService _archiveService;
 
-    public ASISCoreAPI(string configFile, string archiveRoot)
+    public ASISCoreAPI(string archiveRoot)
     {
-        var configRepo = new ConfigRepository(configFile);
-
         var archiveConfigRepo
             = new ArchiveConfigRepository(Path.Combine(archiveRoot, "archive.json"));
 
@@ -32,10 +28,9 @@ public class ASISCoreAPI
         var hashIndexRepo =
             new HashIndexRepository(Path.Combine(archiveRoot, "hash_index.json"));
 
-        _fileService = new FileService(metadataRepo, tagIndexRepo, hashIndexRepo, archiveConfigRepo, configRepo);
+        _fileService = new FileService(metadataRepo, tagIndexRepo, hashIndexRepo, archiveConfigRepo);
         _searchService = new SearchService(metadataRepo, tagIndexRepo);
         _archiveConfigService = new ArchiveConfigService(archiveConfigRepo);
-        _configService = new ConfigService(configRepo);
         _archiveService = new ArchiveService(metadataRepo, archiveConfigRepo);
     }
 

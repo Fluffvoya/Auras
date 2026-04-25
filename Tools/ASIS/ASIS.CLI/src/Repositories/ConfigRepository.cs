@@ -1,7 +1,7 @@
-﻿using ASIS.Core.Models;
+using ASIS.CLI.Models;
 using ASIS.Core.Storage;
 
-namespace ASIS.Core.Repositories;
+namespace ASIS.CLI.Repositories;
 
 public class ConfigRepository
 {

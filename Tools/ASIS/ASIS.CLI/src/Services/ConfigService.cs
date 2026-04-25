@@ -1,6 +1,6 @@
-﻿using ASIS.Core.Repositories;
+using ASIS.CLI.Repositories;
 
-namespace ASIS.Core.Services;
+namespace ASIS.CLI.Services;
 
 public class ConfigService
 {
