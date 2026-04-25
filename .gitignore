@@ -1,4 +1,6 @@
 ﻿.idea
+.vscode
+.claude
 **/bin
 **/obj
 Auras.sln.DotSettings.user
