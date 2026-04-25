@@ -66,6 +66,7 @@ class Program
             case "delete": return DeleteFile(commands);
             case "unlink": return Unlink(commands);
             case "search": return Search(commands);
+            case "diff": return Diff();
             case "exit": return false;
             default:
             {
@@ -332,6 +333,46 @@ class Program
         catch (Exception ex)
         {
             Console.WriteLine($"Search failed: {ex.Message}");
+        }
+
+        return true;
+    }
+
+    static bool Diff()
+    {
+        if (!RequireArchive()) return true;
+
+        try
+        {
+            var result = _api.Diff();
+
+            if (result.OrphanedMetadata.Count == 0 && result.OrphanedDiskFiles.Count == 0)
+            {
+                Console.WriteLine("No differences found. Metadata and disk are in sync.");
+                return true;
+            }
+
+            if (result.OrphanedMetadata.Count > 0)
+            {
+                Console.WriteLine($"Metadata records with no corresponding disk file ({result.OrphanedMetadata.Count}):");
+                foreach (var record in result.OrphanedMetadata)
+                {
+                    Console.WriteLine($" - {record.RelativePath} (ID: {record.Id})");
+                }
+            }
+
+            if (result.OrphanedDiskFiles.Count > 0)
+            {
+                Console.WriteLine($"Disk files with no corresponding metadata record ({result.OrphanedDiskFiles.Count}):");
+                foreach (var path in result.OrphanedDiskFiles)
+                {
+                    Console.WriteLine($" - {path}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Diff failed: {ex.Message}");
         }
 
         return true;
