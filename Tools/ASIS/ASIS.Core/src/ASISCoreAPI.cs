@@ -14,6 +14,8 @@ public class ASISCoreAPI
 
     private readonly ConfigService _configService;
 
+    private readonly ArchiveService _archiveService;
+
     public ASISCoreAPI(string configFile, string archiveRoot)
     {
         var configRepo = new ConfigRepository(configFile);
@@ -34,6 +36,7 @@ public class ASISCoreAPI
         _searchService = new SearchService(metadataRepo, tagIndexRepo);
         _archiveConfigService = new ArchiveConfigService(archiveConfigRepo);
         _configService = new ConfigService(configRepo);
+        _archiveService = new ArchiveService(metadataRepo, archiveConfigRepo);
     }
 
     public string ArchiveName => _archiveConfigService.ArchiveName;
@@ -148,4 +151,6 @@ public class ASISCoreAPI
     public List<FileRecord> SearchByTags(List<string> tags) => _searchService.SearchByTags(tags);
 
     public List<FileRecord> SearchByTime(DateTime start, DateTime end) => _searchService.SearchByTime(start, end);
+
+    public DiffResult Diff() => _archiveService.Diff();
 }
