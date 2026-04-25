@@ -103,12 +103,7 @@ class Program
         {
             string fileDir = Path.Combine(path, "archive.json");
             if (!File.Exists(fileDir)) return true;
-            _api = new ASISCoreAPI(
-                Path.Combine(
-                    Environment.GetFolderPath(
-                        Environment.SpecialFolder.LocalApplicationData)
-                    , "PAMS", "config.json")
-                , path);
+            _api = new ASISCoreAPI(path);
         }
 
         return true;

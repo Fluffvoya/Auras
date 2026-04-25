@@ -12,7 +12,6 @@ public class FileServiceTests : IDisposable
     private readonly TagIndexRepository _tagIndex;
     private readonly HashIndexRepository _hashIndex;
     private readonly ArchiveConfigRepository _archiveConfig;
-    private readonly ConfigRepository _configRepo;
     private readonly FileService _fileService;
 
     public FileServiceTests()
@@ -26,7 +25,6 @@ public class FileServiceTests : IDisposable
         var metaJson = Path.Combine(_archiveDir, "metadata.json");
         var tagJson = Path.Combine(_archiveDir, "tag_index.json");
         var hashJson = Path.Combine(_archiveDir, "hash_index.json");
-        var configJson = Path.Combine(_tmpDir, "config.json");
 
         // Write archive config with a name so ArchivePath resolves
         File.WriteAllText(archiveJson, "{\"Name\":\"TestArchive\",\"CreatedTime\":\"2024-01-01T00:00:00\"}");
@@ -35,8 +33,7 @@ public class FileServiceTests : IDisposable
         _metadata = new MetadataRepository(metaJson);
         _tagIndex = new TagIndexRepository(tagJson);
         _hashIndex = new HashIndexRepository(hashJson);
-        _configRepo = new ConfigRepository(configJson);
-        _fileService = new FileService(_metadata, _tagIndex, _hashIndex, _archiveConfig, _configRepo);
+        _fileService = new FileService(_metadata, _tagIndex, _hashIndex, _archiveConfig);
     }
 
     public void Dispose()
