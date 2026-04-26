@@ -3,4 +3,6 @@
 .claude
 **/bin
 **/obj
+**/.venv
+**/__pycache__
 Auras.sln.DotSettings.user
