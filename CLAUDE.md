@@ -74,6 +74,14 @@ Auras.sln
 - **Tests**: xUnit `[Fact]`, naming convention `MethodName_Scenario_ExpectedBehavior`, cleanup via `IDisposable`
 - **Git**: PR-based workflow into `main`, branches prefixed `feature/` / `fix/` / `doc/` / `test/`, imperative commit messages
 
+## New Feature Workflow
+
+When adding a new feature, follow these steps in order:
+
+1. **Write the code** — implement the feature in the appropriate project (ASIS.Core for library logic, ASIS.CLI for command exposure, AuraError for error types). Follow the architecture patterns described above.
+2. **Write unit tests** — add xUnit `[Fact]` tests in `Test/ASIS.Test/` covering the happy path, edge cases, and error conditions. Follow the `MethodName_Scenario_ExpectedBehavior` naming convention.
+3. **Update documentation** — if the feature introduces new public API surface, CLI commands, or user-facing behavior, update the relevant doc files in `doc/`. At minimum, update the corresponding API or usage doc.
+
 ## Documentation
 
 | File | Topic |
