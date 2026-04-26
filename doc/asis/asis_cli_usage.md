@@ -1,112 +1,169 @@
-# ASIS.CLI
+# ASIS.CLI - User Manual
 
-A Read-Eval-Print Loop (REPL) for archive management via `ASISCoreAPI`.
+**Namespace**: `ASIS.CLI`
+**Project**: `Tools/ASIS/ASIS.CLI`
 
-## Build & Run
+Interactive shell for managing ASIS archives. Provides commands for archive creation, file import/export, tagging, search, and archive maintenance.
+
+---
+
+## Getting Started
+
+### Build & Run
 
 ```bash
-dotnet build Tools/ASIS/ASIS.CLI
-dotnet run --project Tools/ASIS/ASIS.CLI
+cd Tools/ASIS/ASIS.CLI
+dotnet build
+dotnet run
 ```
 
-```
-> create my_archive
-[my_archive] > import ./photo.jpg vacation
-[my_archive] > exit
-```
+### Create an Archive
 
-## File Identifier
-
-All file operations accept a `<file>` argument:
-
-| Format | Example | Behavior |
-|--------|---------|----------|
-| Substring | `vacation_photo` | Matches first file with name containing substring |
-| Exact ID | `id:a1b2c3d4-...` | Matches by exact GUID |
-
-When multiple files match a substring, use `id:<guid>` for exact matching.
-
-## Archive
-
-```
-create <name> [path]   # Create archive directory (default path: ./)
-open <path>            # Open existing archive
-close                  # Close current archive
-archive                # Show archive info
+```bash
+create myarchive ./archives
 ```
 
-## File Operations
+### Open an Archive
 
-All file operations require an open archive.
-
-```
-import <path> <primary_tag> [tags] [--desc "text"] [--move]
-    # Copy file into archive (--move to move instead)
-    # Example: import ./photo.jpg vacation summer,beach --desc "Hawaii trip"
-
-rename <file> <new_name>
-    # Example: rename vacation_photo vacation_backup.jpg
-
-retag <file> <new_primary_tag>
-    # Example: retag vacation_photo travel
-
-tag add <file> <tag1,tag2,...>
-    # Example: tag add vacation_photo summer,2024
-
-tag remove <file> <tag1,tag2,...>
-    # Example: tag remove vacation_photo summer
-
-tag list <file>
-    # Example: tag list vacation_photo
-    # Output:
-    #   File: vacation_photo.jpg
-    #   PrimaryTag: vacation
-    #   Tags: [summer, 2024, beach]
-
-info <file>
-    # Shows: ID, Name, PrimaryTag, Tags, Description, Hash, Path, Created
-
-describe <file> <description>
-    # Use empty string "" to clear description
-
-delete <file>        # Delete physical file and metadata
-unlink <file>        # Remove metadata only (keep physical file)
+```bash
+open ./archives/myarchive
 ```
 
-## Search
+---
 
+## Commands
+
+### Archive Management
+
+| Command | Description |
+|---------|-------------|
+| `create <name> [path]` | Create new archive. Defaults to current directory. |
+| `open <path>` | Open existing archive. Requires `archive.json`. |
+| `close` | Close current archive. |
+| `archive` | Show archive info (name, file count, orphans). |
+| `diff` | Show orphaned metadata and untracked files. |
+
+### File Operations
+
+| Command | Description |
+|---------|-------------|
+| `import <path> <tag> [tags...] [--desc "..."] [--move]` | Import file. Use `--move` to move instead of copy. |
+| `rename <file> <new_name>` | Rename a file. |
+| `retag <file> <new_primary_tag>` | Change primary tag. |
+| `tag add <file> <t1,t2,...>` | Add tags. |
+| `tag remove <file> <t1,t2,...>` | Remove tags. |
+| `tag list <file>` | List all tags. |
+| `info <file>` | Show full file details. |
+| `describe <file> <description>` | Set file description. |
+| `delete <file>` | Delete file and metadata. |
+| `unlink <file>` | Remove metadata only (keep physical file). |
+
+### Search
+
+| Command | Description |
+|---------|-------------|
+| `search name <keyword>` | Substring match on filename. |
+| `search tag <t1,t2,...>` | Match ALL specified tags. |
+| `search time <start> <end>` | Date range (format: `yyyy-MM-dd`). |
+
+### ID Lookup
+
+| Command | Description |
+|---------|-------------|
+| `id <guid> [--full]` | Look up file by ID. Use `--full` for complete details. |
+
+### System
+
+| Command | Description |
+|---------|-------------|
+| `help [command]` | Show help for all or specific command. |
+| `exit` | Exit CLI. |
+
+---
+
+## File Resolution
+
+Most commands accept `<file>` as either:
+
+- **Name substring** - Matches first file containing the string
+- **`id:<guid>`** - Exact match by file ID
+
+When multiple files match a substring, use `id:<guid>` for disambiguation.
+
+---
+
+## Examples
+
+### Basic Workflow
+
+```bash
+# Create and open archive
+create projects ./archives
+open ./archives/projects
+
+# Import files
+import ./docs/readme.md documentation
+import ./src/main.cs code,csharp --desc "Main application entry"
+
+# Search
+search tag documentation
+search name readme
+
+# Update tags
+tag add "readme" overview,getting-started
+tag list "readme"
+
+# Rename and describe
+rename "readme" README.md
+describe "readme" "Project overview and setup instructions"
+
+# View file info
+info "README.md"
+id <guid> --full
+
+# Archive maintenance
+archive
+diff
 ```
-search name <keyword>                   # substring match on name
-search tag <tag1,tag2,...>              # file must have ALL tags
-search time <yyyy-MM-dd> <yyyy-MM-dd>   # date range
 
-id <guid> [--full]                      # lookup by GUID (--full for details)
-diff                                     # show orphaned metadata / untracked files
+### Import Options
+
+```bash
+# Copy file (default)
+import photo.jpg images
+
+# Move file instead
+import photo.jpg images --move
+
+# With description
+import report.pdf documents --desc "Q4 2025 financial report"
+
+# Multiple tags
+import data.csv data,csv,analysis
 ```
 
-Example search output:
-```
-──────────────────────────────────────────────────────
-  Found 2 file(s):
-──────────────────────────────────────────────────────
-  [a1b2c3d4-...]
-    Name:       vacation_photo.jpg
-    PrimaryTag: vacation
-    Tags:       [summer, beach]
-    Desc:       Hawaii trip
+### Search Examples
 
-  [e5f6a1b2-...]
-    Name:       vacation_map.png
-    PrimaryTag: travel
-    Tags:       [map]
+```bash
+# Find files by name
+search name invoice
+
+# Find files with specific tags
+search tag documents,pending
+
+# Find files by date
+search time 2025-01-01 2025-12-31
 ```
 
-## Help & Exit
+### Cleanup
 
-```
-help              # list all commands
-help <command>    # help for specific command
-exit              # quit CLI
-```
+```bash
+# Check for problems
+diff
 
-Errors are printed in red to stderr.
+# Remove orphaned metadata (file kept on disk)
+unlink id:<guid>
+
+# Delete everything
+delete id:<guid>
+```
