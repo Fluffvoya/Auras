@@ -17,9 +17,10 @@ Auras/
 │   ├── .env.example       # API key & path template
 │   └── pyproject.toml     # uv-managed Python project
 │
-├── AuraError/             # Shared C# error library
-│   ├── Exceptions/        # Domain exception types (DuplicateFile, Validation, etc.)
-│   └── Results/           # Result<T> monad
+├── Error/
+│   └── AuraError.NET/     # Shared C# error library
+│       ├── Exceptions/    # Domain exception types (DuplicateFile, Validation, etc.)
+│       └── Results/       # Result<T> monad
 │
 ├── Tools/
 │   └── ASIS/              # Archive System for Indexed Storage
@@ -39,13 +40,13 @@ Auras/
 | Directory | Language | Purpose |
 |-----------|----------|---------|
 | `Aura/` | Python 3.11+ | AI agent powered by Claude. Manages archives through natural-language conversation. |
-| `AuraError/` | C# .NET 10 | Shared error handling: typed exceptions, `Result<T>` monad. Referenced by both ASIS projects. |
+| `Error/AuraError.NET/` | C# .NET 10 | Shared error handling: typed exceptions, `Result<T>` monad. Referenced by both ASIS projects. |
 | `Tools/ASIS/ASIS.CLI/` | C# .NET 10 | Command-line interface for ASIS: import, search, tag, delete files. |
 | `Tools/ASIS/ASIS.Core/` | C# .NET 10 | Core archive engine: JSON-backed file records, hash/tag indexing, search. |
 | `Test/ASIS.Test/` | C# (xUnit) | Unit tests for ASIS.Core repositories, services, and utilities. |
 
 ## Dependencies
 
-- **ASIS.Core** → depends on `AuraError`
-- **ASIS.CLI** → depends on `ASIS.Core` and `AuraError`
+- **ASIS.Core** → depends on `AuraError.NET`
+- **ASIS.CLI** → depends on `ASIS.Core` and `AuraError.NET`
 - **Aura** (Python) → calls `ASIS.CLI` as a subprocess
