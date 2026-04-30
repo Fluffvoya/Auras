@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\AuraError\AuraError.csproj" />
+        <ProjectReference Include="..\..\..\Error\AuraError.NET\AuraError.NET.csproj" />
     </ItemGroup>
 
 </Project>

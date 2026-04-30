@@ -1,4 +1,4 @@
-# AuraError - API Reference
+# AuraError.NET - API Reference
 
 **Namespace**: `AuraError`
 **Assembly**: `aura-error`

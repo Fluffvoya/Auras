@@ -14,7 +14,7 @@ doc/
 │   └── asis_cli_usage.md    # CLI commands and examples
 │
 └── error/
-    └── error_api.md         # AuraError exception types and Result<T>
+    └── error_api.md         # AuraError.NET exception types and Result<T>
 ```
 
 ## Naming Convention
@@ -31,4 +31,4 @@ doc/
 | ASIS architecture | `asis/asis_structure.md` |
 | ASIS public API | `asis/asis_api.md` |
 | ASIS CLI reference | `asis/asis_cli_usage.md` |
-| Error handling API | `error/error_api.md` |
+| Error handling API | `error/error_api.md` (AuraError.NET) |

@@ -46,7 +46,7 @@ Tools/ASIS/ASIS.Core/
 
 | Class | Description |
 |-------|-------------|
-| `FileService` | Core file operations: import, rename, retag, add/remove tags, delete. Throws `AuraError` exceptions on validation failures |
+| `FileService` | Core file operations: import, rename, retag, add/remove tags, delete. Throws `AuraError.NET` exceptions on validation failures |
 | `SearchService` | Search operations: by name (substring), by tags (intersection), by time range |
 | `ArchiveService` | Archive-wide operations: `Diff()` finds orphaned metadata and untracked disk files |
 | `ArchiveConfigService` | Provides read-only access to archive name |
@@ -66,5 +66,5 @@ Tools/ASIS/ASIS.Core/
 
 ## Dependencies
 
-- `AuraError` - Error handling library
+- `AuraError.NET` - Error handling library (under `Error/` directory)
 - `System.Text.Json` - JSON serialization
