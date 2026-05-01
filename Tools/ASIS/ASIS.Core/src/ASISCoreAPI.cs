@@ -1,6 +1,7 @@
 ﻿using ASIS.Core.Models;
 using ASIS.Core.Repositories;
 using ASIS.Core.Services;
+using AuraError.Exceptions;
 
 namespace ASIS.Core;
 
@@ -139,6 +140,176 @@ public class ASISCoreAPI
         {
             _fileService.DeleteMetadataOnly(fileRecord.Id);
         }
+    }
+
+    // ==================== Batch Operations ====================
+
+    public BatchResult ChangeFileName(IEnumerable<Guid> ids, string newFileName)
+    {
+        var result = new BatchResult();
+        foreach (var id in ids)
+        {
+            try
+            {
+                _fileService.ChangeFileName(id, newFileName);
+                result.Items.Add(new BatchItemResult { FileId = id, IsSuccess = true });
+            }
+            catch (Exception ex)
+            {
+                result.Items.Add(new BatchItemResult
+                {
+                    FileId = id,
+                    IsSuccess = false,
+                    Error = ex.Message,
+                    ErrorCode = (ex as AuraException)?.Code
+                });
+            }
+        }
+        return result;
+    }
+
+    public BatchResult ChangeDescription(IEnumerable<Guid> ids, string newDescription)
+    {
+        var result = new BatchResult();
+        foreach (var id in ids)
+        {
+            try
+            {
+                _fileService.ChangeDescription(id, newDescription);
+                result.Items.Add(new BatchItemResult { FileId = id, IsSuccess = true });
+            }
+            catch (Exception ex)
+            {
+                result.Items.Add(new BatchItemResult
+                {
+                    FileId = id,
+                    IsSuccess = false,
+                    Error = ex.Message,
+                    ErrorCode = (ex as AuraException)?.Code
+                });
+            }
+        }
+        return result;
+    }
+
+    public BatchResult ChangePrimaryTag(IEnumerable<Guid> ids, string newPrimaryTag)
+    {
+        var result = new BatchResult();
+        foreach (var id in ids)
+        {
+            try
+            {
+                _fileService.ChangePrimaryTag(id, newPrimaryTag);
+                result.Items.Add(new BatchItemResult { FileId = id, IsSuccess = true });
+            }
+            catch (Exception ex)
+            {
+                result.Items.Add(new BatchItemResult
+                {
+                    FileId = id,
+                    IsSuccess = false,
+                    Error = ex.Message,
+                    ErrorCode = (ex as AuraException)?.Code
+                });
+            }
+        }
+        return result;
+    }
+
+    public BatchResult AddTags(IEnumerable<Guid> ids, List<string> tags)
+    {
+        var result = new BatchResult();
+        foreach (var id in ids)
+        {
+            try
+            {
+                _fileService.AddTags(id, tags);
+                result.Items.Add(new BatchItemResult { FileId = id, IsSuccess = true });
+            }
+            catch (Exception ex)
+            {
+                result.Items.Add(new BatchItemResult
+                {
+                    FileId = id,
+                    IsSuccess = false,
+                    Error = ex.Message,
+                    ErrorCode = (ex as AuraException)?.Code
+                });
+            }
+        }
+        return result;
+    }
+
+    public BatchResult RemoveTags(IEnumerable<Guid> ids, List<string> tags)
+    {
+        var result = new BatchResult();
+        foreach (var id in ids)
+        {
+            try
+            {
+                _fileService.RemoveTags(id, tags);
+                result.Items.Add(new BatchItemResult { FileId = id, IsSuccess = true });
+            }
+            catch (Exception ex)
+            {
+                result.Items.Add(new BatchItemResult
+                {
+                    FileId = id,
+                    IsSuccess = false,
+                    Error = ex.Message,
+                    ErrorCode = (ex as AuraException)?.Code
+                });
+            }
+        }
+        return result;
+    }
+
+    public BatchResult DeleteFile(IEnumerable<Guid> ids)
+    {
+        var result = new BatchResult();
+        foreach (var id in ids)
+        {
+            try
+            {
+                _fileService.DeleteFile(id);
+                result.Items.Add(new BatchItemResult { FileId = id, IsSuccess = true });
+            }
+            catch (Exception ex)
+            {
+                result.Items.Add(new BatchItemResult
+                {
+                    FileId = id,
+                    IsSuccess = false,
+                    Error = ex.Message,
+                    ErrorCode = (ex as AuraException)?.Code
+                });
+            }
+        }
+        return result;
+    }
+
+    public BatchResult DeleteMetadataOnly(IEnumerable<Guid> ids)
+    {
+        var result = new BatchResult();
+        foreach (var id in ids)
+        {
+            try
+            {
+                _fileService.DeleteMetadataOnly(id);
+                result.Items.Add(new BatchItemResult { FileId = id, IsSuccess = true });
+            }
+            catch (Exception ex)
+            {
+                result.Items.Add(new BatchItemResult
+                {
+                    FileId = id,
+                    IsSuccess = false,
+                    Error = ex.Message,
+                    ErrorCode = (ex as AuraException)?.Code
+                });
+            }
+        }
+        return result;
     }
 
     public List<FileRecord> SearchByName(string keyword) => _searchService.SearchByName(keyword);

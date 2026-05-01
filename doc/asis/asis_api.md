@@ -142,6 +142,47 @@ Remove metadata only (unlink file from archive).
 
 ---
 
+### Batch Operations
+
+All batch methods accept a collection of file IDs and process each item independently.
+Per-item failures are collected in the returned `BatchResult` — one failure does not
+stop the remaining items. Batch operations do not modify `FileService` or repositories.
+
+```csharp
+public BatchResult ChangeFileName(IEnumerable<Guid> ids, string newFileName)
+public BatchResult ChangeDescription(IEnumerable<Guid> ids, string newDescription)
+public BatchResult ChangePrimaryTag(IEnumerable<Guid> ids, string newPrimaryTag)
+public BatchResult AddTags(IEnumerable<Guid> ids, List<string> tags)
+public BatchResult RemoveTags(IEnumerable<Guid> ids, List<string> tags)
+public BatchResult DeleteFile(IEnumerable<Guid> ids)
+public BatchResult DeleteMetadataOnly(IEnumerable<Guid> ids)
+```
+
+**Result model**:
+
+```csharp
+public class BatchResult
+{
+    public int TotalCount { get; }
+    public int SuccessCount { get; }
+    public int FailureCount { get; }
+    public List<BatchItemResult> Items { get; }
+}
+
+public class BatchItemResult
+{
+    public Guid FileId { get; set; }
+    public bool IsSuccess { get; set; }
+    public string? Error { get; set; }
+    public string? ErrorCode { get; set; } // AuraException.Code value
+}
+```
+
+**Error handling**: Each file is wrapped in try/catch. `ErrorCode` maps to the
+`AuraException.Code` when the exception is an AuraException subtype.
+
+---
+
 ### SearchByName
 
 ```csharp
