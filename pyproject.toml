@@ -1,0 +1,8 @@
+[project]
+name = "auras"
+version = "0.0.0"
+description = "Auras project workspace"
+requires-python = ">=3.11"
+
+[tool.uv.workspace]
+members = ["Aura"]
