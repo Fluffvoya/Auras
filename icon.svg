@@ -1,22 +1,15 @@
-<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
   <defs>
-    <radialGradient id="warmAuraStatic" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#FFF7EC"/>
-      <stop offset="35%" stop-color="#FFE3C2"/>
-      <stop offset="70%" stop-color="#FFCFAF"/>
-      <stop offset="100%" stop-color="#FFBFAF"/>
+    <radialGradient id="auraGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E8996B"/>
+      <stop offset="50%" stop-color="#EAA87A"/>
+      <stop offset="100%" stop-color="#F2D08D"/>
     </radialGradient>
   </defs>
 
-  <g transform="translate(128,128)">
-    
-    <circle r="96" fill="url(#warmAuraStatic)" opacity="0.25"/>
-    
-    <circle r="64" fill="url(#warmAuraStatic)" opacity="0.45"/>
-    
-    <circle r="36" fill="url(#warmAuraStatic)" opacity="0.7"/>
-    
-    <circle r="16" fill="url(#warmAuraStatic)"/>
-    
-  </g>
+  <circle cx="128" cy="128" r="124" fill="none" stroke="#F2C98D" stroke-width="2.5" opacity="0.4"/>
+  <circle cx="128" cy="128" r="105" fill="none" stroke="#EAA87A" stroke-width="2.5" opacity="0.6"/>
+  <circle cx="128" cy="128" r="86" fill="none" stroke="#E8996B" stroke-width="2.5" opacity="0.8"/>
+  <circle cx="128" cy="128" r="67" fill="none" stroke="#D4956A" stroke-width="2.5" opacity="1"/>
+  <circle cx="128" cy="128" r="48" fill="url(#auraGrad)"/>
 </svg>
