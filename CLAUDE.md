@@ -29,3 +29,21 @@ Auras/
 - **Python (Aura):** managed via `uv`, requires Python >=3.11
 - **C# (Tools, Error/AuraError.NET, Test):** .NET 10.0
 - **Documentation:** Markdown files under `doc/`, organized by component
+
+## Branch Naming Convention
+
+Branch names should follow the format: `<category>/<short-description>`
+
+### Categories
+
+- `feature` — New features or enhancements
+- `bugfix` — Bug fixes
+- `refactor` — Code refactoring (improving internal structure without changing external behavior)
+- `docs` — Documentation updates
+- `chore` — Miscellaneous tasks (dependency updates, CI configuration, cleanup)
+
+### Rules
+
+- Use English, lowercase, and hyphens to separate words
+- Keep descriptions concise but meaningful
+- Examples: `feature/add-new-feature`, `bugfix/fix-login-error`, `refactor/simplify-auth-logic`
