@@ -89,7 +89,7 @@ def main() -> None:
     console.print(
         Panel("[bold]Aura[/bold] \u2014 Your AI assistant", border_style="gold3")
     )
-    console.print("[dim]Type 'exit' to quit.[/dim]\n")
+    console.print("[dim]Type '/exit' to quit.[/dim]\n")
 
     model_name = config.llm.model_name
     input_prompt = f"[bold dark_orange]You[/] [dim]({model_name})[/]: "
@@ -103,7 +103,7 @@ def main() -> None:
 
             if not user_input:
                 continue
-            if user_input.lower() == "exit":
+            if user_input.lower() == "/exit":
                 break
 
             console.print("[bold dark_orange]Aura:[/] ", end="")
