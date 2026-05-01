@@ -2,6 +2,7 @@ using System.Text;
 using ASIS.Core;
 using ASIS.Core.Models;
 using ASIS.Core.Storage;
+using Spectre.Console;
 
 namespace ASIS.CLI;
 
@@ -16,18 +17,15 @@ class Program
         while (true)
         {
             var archive = _api?.ArchiveName;
-            Console.Write(archive == null ? $"{Cyan}> {Reset}" : $"{Magenta}[{archive}] {Cyan}> {Reset}");
+            var prompt = archive == null
+                ? "[cyan]>[/] "
+                : $"[magenta][[{archive}]][/] [cyan]>[/] ";
+            AnsiConsole.Markup(prompt);
             string? input = Console.ReadLine();
-            if (input == null) { Console.WriteLine(); continue; }
+            if (input == null) { AnsiConsole.WriteLine(); continue; }
             if (!Process(input)) break;
         }
     }
-
-    private const string Magenta = "\u001b[95m";
-    private const string Red = "\u001b[91m";
-    private const string Reset = "\u001b[0m";
-    private const string Cyan = "\u001b[96m";
-    private const string Bold = "\u001b[1m";
 
     static bool Process(string input)
     {
@@ -37,13 +35,10 @@ class Program
         var cmd = tokens[0].ToLowerInvariant();
         return cmd switch
         {
-            // Archive management
             "create" => CreateArchive(tokens),
             "open" => OpenArchive(tokens),
             "close" => CloseArchive(),
             "archive" => ShowArchiveInfo(),
-
-            // File operations
             "import" => ImportFile(tokens),
             "rename" => RenameFile(tokens),
             "retag" => RetagFile(tokens),
@@ -52,23 +47,12 @@ class Program
             "describe" => DescribeFile(tokens),
             "delete" => DeleteFile(tokens),
             "unlink" => UnlinkFile(tokens),
-
-            // Search
             "search" => Search(tokens),
-
-            // Batch
             "batch" => BatchCommand(tokens),
-
-            // ID lookup
             "id" => IdLookup(tokens),
-
-            // Archive utilities
             "diff" => ShowDiff(),
-
-            // System
             "help" => Help(tokens),
             "exit" => false,
-
             _ => UnknownCommand(cmd)
         };
     }
@@ -174,18 +158,20 @@ class Program
     static bool ShowArchiveInfo()
     {
         if (!RequireArchive()) return true;
-        ConsoleWriter.PrintDivider();
-        ConsoleWriter.Title("Archive Info");
-        ConsoleWriter.Label("  Name:     ");
-        Console.WriteLine(_api!.ArchiveName);
-        var diff = _api.Diff();
-        ConsoleWriter.Label("  Files:    ");
-        Console.WriteLine(_api.SearchByName("").Count.ToString());
-        ConsoleWriter.Label("  Orphaned: ");
-        Console.WriteLine(diff.OrphanedMetadata.Count.ToString());
-        ConsoleWriter.Label("  Untracked:");
-        Console.WriteLine(diff.OrphanedDiskFiles.Count.ToString());
-        ConsoleWriter.PrintDivider();
+        var diff = _api!.Diff();
+
+        var table = new Table()
+            .Title("[bold cyan]Archive Info[/]")
+            .Border(TableBorder.Rounded)
+            .AddColumn(new TableColumn("[bold]Property[/]").LeftAligned())
+            .AddColumn(new TableColumn("[bold]Value[/]").LeftAligned());
+
+        table.AddRow("Name", Markup.Escape(_api.ArchiveName ?? ""));
+        table.AddRow("Files", _api.SearchByName("").Count.ToString());
+        table.AddRow("Orphaned", diff.OrphanedMetadata.Count.ToString());
+        table.AddRow("Untracked", diff.OrphanedDiskFiles.Count.ToString());
+
+        AnsiConsole.Write(table);
         return true;
     }
 
@@ -193,28 +179,25 @@ class Program
     {
         if (!RequireArchive()) return true;
         var diff = _api!.Diff();
-        ConsoleWriter.PrintDivider();
-        ConsoleWriter.Title("Archive Diff");
+
         if (!diff.OrphanedMetadata.Any() && !diff.OrphanedDiskFiles.Any())
         {
-            ConsoleWriter.Ok("  Archive is clean - no orphans or untracked files.");
+            ConsoleWriter.Ok("Archive is clean - no orphans or untracked files.");
+            return true;
         }
-        else
+
+        if (diff.OrphanedMetadata.Any())
         {
-            if (diff.OrphanedMetadata.Any())
-            {
-                ConsoleWriter.Warn($"  {diff.OrphanedMetadata.Count()} orphaned metadata record(s):");
-                foreach (var m in diff.OrphanedMetadata)
-                    Console.WriteLine($"    - {m.Name} ({m.Id})");
-            }
-            if (diff.OrphanedDiskFiles.Any())
-            {
-                ConsoleWriter.Warn($"  {diff.OrphanedDiskFiles.Count()} untracked file(s):");
-                foreach (var f in diff.OrphanedDiskFiles)
-                    Console.WriteLine($"    - {f}");
-            }
+            ConsoleWriter.Warn($"{diff.OrphanedMetadata.Count()} orphaned metadata record(s):");
+            foreach (var m in diff.OrphanedMetadata)
+                AnsiConsole.MarkupLine($"  [dim]-[/] {Markup.Escape(m.Name)} [dim]({m.Id})[/]");
         }
-        ConsoleWriter.PrintDivider();
+        if (diff.OrphanedDiskFiles.Any())
+        {
+            ConsoleWriter.Warn($"{diff.OrphanedDiskFiles.Count()} untracked file(s):");
+            foreach (var f in diff.OrphanedDiskFiles)
+                AnsiConsole.MarkupLine($"  [dim]-[/] {Markup.Escape(f)}");
+        }
         return true;
     }
 
@@ -416,9 +399,16 @@ class Program
 
     static bool TagList(FileRecord file)
     {
-        Console.WriteLine($"File: {file.Name}");
-        Console.WriteLine($"PrimaryTag: {file.PrimaryTag}");
-        Console.WriteLine($"Tags: [{string.Join(", ", file.Tags ?? new List<string>())}]");
+        var table = new Table()
+            .Border(TableBorder.Rounded)
+            .AddColumn(new TableColumn("[bold]Field[/]").LeftAligned())
+            .AddColumn(new TableColumn("[bold]Value[/]").LeftAligned());
+
+        table.AddRow("File", Markup.Escape(file.Name));
+        table.AddRow("PrimaryTag", Markup.Escape(file.PrimaryTag));
+        table.AddRow("Tags", $"[[{string.Join(", ", file.Tags ?? new List<string>())}]]");
+
+        AnsiConsole.Write(table);
         return true;
     }
 
@@ -445,14 +435,22 @@ class Program
 
     static void PrintFileInfo(FileRecord file)
     {
-        Console.WriteLine($"  ID:          {file.Id}");
-        Console.WriteLine($"  Name:        {file.Name}");
-        Console.WriteLine($"  PrimaryTag:  {file.PrimaryTag}");
-        Console.WriteLine($"  Tags:        [{string.Join(", ", file.Tags ?? new List<string>())}]");
-        Console.WriteLine($"  Description: {file.Description ?? "(none)"}");
-        Console.WriteLine($"  Hash:        {file.Hash}");
-        Console.WriteLine($"  Path:        {file.RelativePath}");
-        Console.WriteLine($"  Created:     {file.CreatedTime:yyyy-MM-dd HH:mm:ss}");
+        var table = new Table()
+            .Title("[bold cyan]File Info[/]")
+            .Border(TableBorder.Rounded)
+            .AddColumn(new TableColumn("[bold]Field[/]").LeftAligned())
+            .AddColumn(new TableColumn("[bold]Value[/]").LeftAligned());
+
+        table.AddRow("ID", file.Id.ToString());
+        table.AddRow("Name", Markup.Escape(file.Name));
+        table.AddRow("PrimaryTag", Markup.Escape(file.PrimaryTag));
+        table.AddRow("Tags", $"[[{string.Join(", ", file.Tags ?? new List<string>())}]]");
+        table.AddRow("Description", Markup.Escape(file.Description ?? "(none)"));
+        table.AddRow("Hash", file.Hash);
+        table.AddRow("Path", Markup.Escape(file.RelativePath));
+        table.AddRow("Created", file.CreatedTime.ToString("yyyy-MM-dd HH:mm:ss"));
+
+        AnsiConsole.Write(table);
     }
 
     static bool DescribeFile(List<string> tokens)
@@ -585,17 +583,27 @@ class Program
         }
 
         ConsoleWriter.Ok($"Found {results.Count} file(s):");
-        ConsoleWriter.PrintDivider();
+
+        var table = new Table()
+            .Border(TableBorder.Rounded)
+            .AddColumn(new TableColumn("[bold cyan]ID[/]").LeftAligned())
+            .AddColumn(new TableColumn("[bold]Name[/]").LeftAligned())
+            .AddColumn(new TableColumn("[bold]PrimaryTag[/]").LeftAligned())
+            .AddColumn(new TableColumn("[bold]Tags[/]").LeftAligned())
+            .AddColumn(new TableColumn("[bold]Description[/]").LeftAligned());
+
         foreach (var r in results)
         {
-            Console.WriteLine($"  {Cyan}[{r.Id}]{Reset}");
-            Console.WriteLine($"    {Bold}Name:{Reset}       {r.Name}");
-            Console.WriteLine($"    {Bold}PrimaryTag:{Reset} {r.PrimaryTag}");
-            Console.WriteLine($"    {Bold}Tags:{Reset}       [{string.Join(", ", r.Tags ?? new List<string>())}]");
-            if (!string.IsNullOrEmpty(r.Description))
-                Console.WriteLine($"    {Bold}Desc:{Reset}       {r.Description}");
-            Console.WriteLine();
+            table.AddRow(
+                r.Id.ToString(),
+                Markup.Escape(r.Name),
+                Markup.Escape(r.PrimaryTag),
+                $"[[{string.Join(", ", r.Tags ?? new List<string>())}]]",
+                Markup.Escape(r.Description ?? "")
+            );
         }
+
+        AnsiConsole.Write(table);
     }
 
     // ==================== Batch Operations ====================
@@ -632,12 +640,9 @@ class Program
             return true;
         }
 
-        // Prompt confirmation for destructive operations
         if (IsDestructiveOp(op, tokens))
         {
-            ConsoleWriter.Warn($"This will affect {files.Count} file(s). Proceed? (y/N)");
-            var response = Console.ReadLine()?.Trim().ToLowerInvariant();
-            if (response != "y" && response != "yes")
+            if (!AnsiConsole.Confirm($"[yellow]This will affect {files.Count} file(s). Proceed?[/]"))
             {
                 ConsoleWriter.Info("Cancelled.");
                 return true;
@@ -731,29 +736,35 @@ class Program
 
     static void PrintBatchResult(string operation, BatchResult result)
     {
-        ConsoleWriter.PrintDivider();
-        ConsoleWriter.Title($"Batch '{operation}' Results");
-        ConsoleWriter.Label($"  Total:    ");
-        Console.WriteLine(result.TotalCount);
-        ConsoleWriter.Label($"  Succeeded:");
-        ConsoleWriter.Ok(result.SuccessCount.ToString());
-        ConsoleWriter.Label($"  Failed:   ");
+        var table = new Table()
+            .Title($"[bold cyan]Batch '{operation}' Results[/]")
+            .Border(TableBorder.Rounded)
+            .AddColumn(new TableColumn("[bold]Metric[/]").LeftAligned())
+            .AddColumn(new TableColumn("[bold]Value[/]").LeftAligned());
 
-        if (result.FailureCount > 0)
-            Console.WriteLine($"{Red}{result.FailureCount}{Reset}");
-        else
-            Console.WriteLine("0");
+        table.AddRow("Total", result.TotalCount.ToString());
+        table.AddRow("Succeeded", $"[green]{result.SuccessCount}[/]");
+        table.AddRow("Failed", result.FailureCount > 0 ? $"[red]{result.FailureCount}[/]" : "0");
+
+        AnsiConsole.Write(table);
 
         if (result.FailureCount > 0)
         {
-            ConsoleWriter.Warn("  Failures:");
+            var failureTable = new Table()
+                .Title("[yellow]Failures[/]")
+                .Border(TableBorder.Rounded)
+                .AddColumn(new TableColumn("[bold]File ID[/]").LeftAligned())
+                .AddColumn(new TableColumn("[bold]Error[/]").LeftAligned());
+
             foreach (var item in result.Items.Where(i => !i.IsSuccess))
             {
-                string errorCode = item.ErrorCode != null ? $" [{item.ErrorCode}]" : "";
-                Console.WriteLine($"    - {Magenta}{item.FileId}{Reset}: {item.Error}{errorCode}");
+                string errorCode = item.ErrorCode != null ? $" [[{item.ErrorCode}]]" : "";
+                string errorMessage = item.Error != null ? $" [[{item.ErrorCode}]]" : "";
+                failureTable.AddRow(item.FileId.ToString(), $"{Markup.Escape(errorMessage)}{errorCode}");
             }
+
+            AnsiConsole.Write(failureTable);
         }
-        ConsoleWriter.PrintDivider();
     }
 
     // ==================== ID Lookup ====================
@@ -787,10 +798,17 @@ class Program
             }
             else
             {
-                Console.WriteLine($"Name:       {file.Name}");
-                Console.WriteLine($"PrimaryTag: {file.PrimaryTag}");
-                Console.WriteLine($"Tags:       [{string.Join(", ", file.Tags ?? new List<string>())}]");
-                Console.WriteLine($"Description:{file.Description ?? "(none)"}");
+                var table = new Table()
+                    .Border(TableBorder.Rounded)
+                    .AddColumn(new TableColumn("[bold]Field[/]").LeftAligned())
+                    .AddColumn(new TableColumn("[bold]Value[/]").LeftAligned());
+
+                table.AddRow("Name", Markup.Escape(file.Name));
+                table.AddRow("PrimaryTag", Markup.Escape(file.PrimaryTag));
+                table.AddRow("Tags", $"[[{string.Join(", ", file.Tags ?? new List<string>())}]]");
+                table.AddRow("Description", Markup.Escape(file.Description ?? "(none)"));
+
+                AnsiConsole.Write(table);
             }
         }
         catch (Exception ex)
@@ -817,87 +835,92 @@ class Program
 
     static void PrintAllHelp()
     {
-        ConsoleWriter.PrintDivider();
-        ConsoleWriter.Title("  ASIS.CLI - Archive Management Shell");
-        ConsoleWriter.PrintDivider();
+        var grid = new Grid()
+            .AddColumn(new GridColumn().NoWrap())
+            .AddColumn(new GridColumn());
 
-        ConsoleWriter.Label("  Archive Management:");
-        Console.WriteLine("    create <name> [path]   Create a new archive");
-        Console.WriteLine("    open <path>             Open an existing archive");
-        Console.WriteLine("    close                  Close the current archive");
-        Console.WriteLine("    archive                 Show current archive info");
-        Console.WriteLine("    diff                    Show orphaned/untracked files");
-        Console.WriteLine();
+        grid.AddRow("[bold cyan]ASIS.CLI[/]", "[dim]Archive Management Shell[/]");
 
-        ConsoleWriter.Label("  File Operations:");
-        Console.WriteLine("    import <path> <tag> [tags...] [--desc \"...\"] [--move]");
-        Console.WriteLine("                              Import a file (copy by default)");
-        Console.WriteLine("    rename <file> <new>     Rename a file");
-        Console.WriteLine("    retag <file> <tag>      Change primary tag");
-        Console.WriteLine("    tag add <file> <t1,t2>  Add tags");
-        Console.WriteLine("    tag remove <file> <t>   Remove tags");
-        Console.WriteLine("    tag list <file>         List all tags");
-        Console.WriteLine("    info <file>             Show file information");
-        Console.WriteLine("    describe <file> <desc>  Set file description");
-        Console.WriteLine("    delete <file>           Delete file and metadata");
-        Console.WriteLine("    unlink <file>           Remove metadata only");
-        Console.WriteLine();
+        AnsiConsole.Write(new Rule("[bold]Archive Management[/]").RuleStyle("dim"));
+        AnsiConsole.MarkupLine("  [bold]create[/] <name> [[path]]          Create a new archive");
+        AnsiConsole.MarkupLine("  [bold]open[/] <path>                  Open an existing archive");
+        AnsiConsole.MarkupLine("  [bold]close[/]                        Close the current archive");
+        AnsiConsole.MarkupLine("  [bold]archive[/]                      Show current archive info");
+        AnsiConsole.MarkupLine("  [bold]diff[/]                         Show orphaned/untracked files");
+        AnsiConsole.WriteLine();
 
-        ConsoleWriter.Label("  Search:");
-        Console.WriteLine("    search name <keyword>   Search by name substring");
-        Console.WriteLine("    search tag <t1,t2>      Search by tag intersection");
-        Console.WriteLine("    search time <s> <e>     Search by date range");
-        Console.WriteLine();
+        AnsiConsole.Write(new Rule("[bold]File Operations[/]").RuleStyle("dim"));
+        AnsiConsole.MarkupLine("  [bold]import[/] <path> <tag> [[tags...]] [[--desc \"...\"]] [[--move]]");
+        AnsiConsole.MarkupLine("                              Import a file (copy by default)");
+        AnsiConsole.MarkupLine("  [bold]rename[/] <file> <new>         Rename a file");
+        AnsiConsole.MarkupLine("  [bold]retag[/] <file> <tag>          Change primary tag");
+        AnsiConsole.MarkupLine("  [bold]tag[/] add <file> <t1,t2>      Add tags");
+        AnsiConsole.MarkupLine("  [bold]tag[/] remove <file> <t>       Remove tags");
+        AnsiConsole.MarkupLine("  [bold]tag[/] list <file>             List all tags");
+        AnsiConsole.MarkupLine("  [bold]info[/] <file>                 Show file information");
+        AnsiConsole.MarkupLine("  [bold]describe[/] <file> <desc>      Set file description");
+        AnsiConsole.MarkupLine("  [bold]delete[/] <file>               Delete file and metadata");
+        AnsiConsole.MarkupLine("  [bold]unlink[/] <file>               Remove metadata only");
+        AnsiConsole.WriteLine();
 
-        ConsoleWriter.Label("  Batch Operations:");
-        Console.WriteLine("    batch rename <file> <n>     Batch rename files");
-        Console.WriteLine("    batch retag <file> <tag>    Batch change primary tag");
-        Console.WriteLine("    batch describe <file> <d>   Batch set description");
-        Console.WriteLine("    batch delete <file>         Batch delete files");
-        Console.WriteLine("    batch unlink <file>         Batch unlink metadata");
-        Console.WriteLine("    batch tag add <file> <t>    Batch add tags");
-        Console.WriteLine("    batch tag remove <file> <t> Batch remove tags");
-        Console.WriteLine();
+        AnsiConsole.Write(new Rule("[bold]Search[/]").RuleStyle("dim"));
+        AnsiConsole.MarkupLine("  [bold]search[/] name <keyword>       Search by name substring");
+        AnsiConsole.MarkupLine("  [bold]search[/] tag <t1,t2>          Search by tag intersection");
+        AnsiConsole.MarkupLine("  [bold]search[/] time <s> <e>         Search by date range");
+        AnsiConsole.WriteLine();
 
-        ConsoleWriter.Label("  ID Lookup:");
-        Console.WriteLine("    id <guid> [--full]      Look up file by ID");
-        Console.WriteLine();
+        AnsiConsole.Write(new Rule("[bold]Batch Operations[/]").RuleStyle("dim"));
+        AnsiConsole.MarkupLine("  [bold]batch[/] rename <file> <n>     Batch rename files");
+        AnsiConsole.MarkupLine("  [bold]batch[/] retag <file> <tag>    Batch change primary tag");
+        AnsiConsole.MarkupLine("  [bold]batch[/] describe <file> <d>   Batch set description");
+        AnsiConsole.MarkupLine("  [bold]batch[/] delete <file>         Batch delete files");
+        AnsiConsole.MarkupLine("  [bold]batch[/] unlink <file>         Batch unlink metadata");
+        AnsiConsole.MarkupLine("  [bold]batch[/] tag add <file> <t>    Batch add tags");
+        AnsiConsole.MarkupLine("  [bold]batch[/] tag remove <file> <t> Batch remove tags");
+        AnsiConsole.WriteLine();
 
-        ConsoleWriter.Label("  System:");
-        Console.WriteLine("    help [command]          Show help");
-        Console.WriteLine("    exit                    Exit CLI");
-        Console.WriteLine();
+        AnsiConsole.Write(new Rule("[bold]ID Lookup[/]").RuleStyle("dim"));
+        AnsiConsole.MarkupLine("  [bold]id[/] <guid> [[--full]]          Look up file by ID");
+        AnsiConsole.WriteLine();
 
-        ConsoleWriter.Dimmed("  <file> can be a name substring or 'id:<guid>' for exact match.");
-        ConsoleWriter.PrintDivider();
+        AnsiConsole.Write(new Rule("[bold]System[/]").RuleStyle("dim"));
+        AnsiConsole.MarkupLine("  [bold]help[/] [[command]]              Show help");
+        AnsiConsole.MarkupLine("  [bold]exit[/]                        Exit CLI");
+        AnsiConsole.WriteLine();
+
+        AnsiConsole.MarkupLine("[dim]<file> can be a name substring or 'id:<guid>' for exact match.[/]");
     }
 
     static void PrintCommandHelp(string cmd)
     {
-        var helpTexts = new Dictionary<string, string>
+        var helpTexts = new Dictionary<string, (string usage, string description)>
         {
-            ["create"] = "create <name> [path]\n  Create a new archive at the specified path.",
-            ["open"] = "open <path>\n  Open an existing archive for editing.",
-            ["close"] = "close\n  Close the current archive.",
-            ["archive"] = "archive\n  Show information about the current archive.",
-            ["import"] = "import <source_path> <primary_tag> [tags...] [--desc \"...\"] [--move]\n  Import a file into the archive. Use --move to move instead of copy.",
-            ["rename"] = "rename <file> <new_name>\n  Rename a file in the archive.",
-            ["retag"] = "retag <file> <new_primary_tag>\n  Change the primary tag of a file.",
-            ["tag"] = "tag add|remove|list <file> [tags]\n  Manage tags on a file.",
-            ["info"] = "info <file>\n  Show detailed information about a file.",
-            ["describe"] = "describe <file> <description>\n  Set or update the description of a file.",
-            ["delete"] = "delete <file>\n  Delete the physical file and its metadata.",
-            ["unlink"] = "unlink <file>\n  Remove metadata only (keep the physical file).",
-            ["search"] = "search name|tag|time <args>\n  Search for files. Types:\n    name <keyword>  - substring match on name\n    tag <t1,t2>     - must have ALL tags\n    time <s> <e>    - date range (yyyy-MM-dd)",
-            ["id"] = "id <guid> [--full]\n  Look up a file by its ID. Use --full for complete details.",
-            ["help"] = "help [command]\n  Show help for all commands or a specific command.",
-            ["exit"] = "exit\n  Exit the CLI.",
-            ["batch"] = "batch <operation> <file> [args...]\n  Run an operation on all files matching <file>.\n  Operations: rename, retag, describe, delete, unlink, tag add, tag remove\n  Examples:\n    batch rename report new_report\n    batch tag add vacation landscape,summer\n    batch delete temp"
+            ["create"] = ("create <name> [[path]]", "Create a new archive at the specified path."),
+            ["open"] = ("open <path>", "Open an existing archive for editing."),
+            ["close"] = ("close", "Close the current archive."),
+            ["archive"] = ("archive", "Show information about the current archive."),
+            ["import"] = ("import <source_path> <primary_tag> [[tags...]] [[--desc \"...\"]] [[--move]]", "Import a file into the archive. Use --move to move instead of copy."),
+            ["rename"] = ("rename <file> <new_name>", "Rename a file in the archive."),
+            ["retag"] = ("retag <file> <new_primary_tag>", "Change the primary tag of a file."),
+            ["tag"] = ("tag add|remove|list <file> [[tags]]", "Manage tags on a file."),
+            ["info"] = ("info <file>", "Show detailed information about a file."),
+            ["describe"] = ("describe <file> <description>", "Set or update the description of a file."),
+            ["delete"] = ("delete <file>", "Delete the physical file and its metadata."),
+            ["unlink"] = ("unlink <file>", "Remove metadata only (keep the physical file)."),
+            ["search"] = ("search name|tag|time <args>", "Search for files. Types:\n  name <keyword> - substring match on name\n  tag <t1,t2>    - must have ALL tags\n  time <s> <e>   - date range (yyyy-MM-dd)"),
+            ["id"] = ("id <guid> [[--full]]", "Look up a file by its ID. Use --full for complete details."),
+            ["help"] = ("help [[command]]", "Show help for all commands or a specific command."),
+            ["exit"] = ("exit", "Exit the CLI."),
+            ["batch"] = ("batch <operation> <file> [[args...]]", "Run an operation on all files matching <file>.\nOperations: rename, retag, describe, delete, unlink, tag add, tag remove\nExamples:\n  batch rename report new_report\n  batch tag add vacation landscape,summer\n  batch delete temp")
         };
 
-        if (helpTexts.TryGetValue(cmd.ToLowerInvariant(), out string? text))
+        if (helpTexts.TryGetValue(cmd.ToLowerInvariant(), out var text))
         {
-            Console.WriteLine(text);
+            var panel = new Panel(text.description)
+                .Header($"[bold]{text.usage}[/]")
+                .Border(BoxBorder.Rounded)
+                .Padding(1, 0);
+            AnsiConsole.Write(panel);
         }
         else
         {
