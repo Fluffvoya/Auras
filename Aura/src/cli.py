@@ -91,10 +91,13 @@ def main() -> None:
     )
     console.print("[dim]Type 'exit' to quit.[/dim]\n")
 
+    model_name = config.llm.model_name
+    input_prompt = f"[bold green]You[/] [dim]({model_name})[/]: "
+
     try:
         while True:
             try:
-                user_input = console.input("[bold green]You:[/] ").strip()
+                user_input = console.input(input_prompt).strip()
             except EOFError:
                 break
 
