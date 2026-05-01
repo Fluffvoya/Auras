@@ -1,0 +1,38 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="warmAura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF6E5"/>
+      <stop offset="35%" stop-color="#FFE0B2"/>
+      <stop offset="70%" stop-color="#FFC9A3"/>
+      <stop offset="100%" stop-color="#FFB7B2"/>
+    </radialGradient>
+  </defs>
+
+  <g transform="translate(128,128)">
+    
+    <circle r="96" fill="url(#warmAura)" opacity="0.25">
+      <animate attributeName="r" values="92;100;92" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.2;0.3;0.2" dur="4s" repeatCount="indefinite"/>
+    </circle>
+
+    <circle r="64" fill="url(#warmAura)" opacity="0.45">
+      <animate attributeName="r" values="60;68;60" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.4;0.55;0.4" dur="4s" repeatCount="indefinite"/>
+    </circle>
+
+    <circle r="36" fill="url(#warmAura)" opacity="0.7">
+      <animate attributeName="r" values="34;40;34" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.65;0.8;0.65" dur="4s" repeatCount="indefinite"/>
+    </circle>
+
+    <circle r="16" fill="url(#warmAura)">
+      <animateTransform 
+        attributeName="transform"
+        type="scale"
+        values="1;1.15;1"
+        dur="4s"
+        repeatCount="indefinite"/>
+    </circle>
+
+  </g>
+</svg>
