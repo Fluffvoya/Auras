@@ -1,24 +1,33 @@
 import sys
+from pathlib import Path
+
+from rich.console import Console
+from rich.panel import Panel
 
 from src.agent import AuraAgent
 from src.config import load_config, save_config
 
+console = Console()
+
 
 def _show_config() -> None:
     cfg = load_config()
-    print(f"Config file: ~/.aura/config.json\n")
-    print(f"  asis_path: {cfg.asis_path}")
-    print(f"  doc_path:  {cfg.doc_path}")
-    print(f"  api_key:   {'*' * 8 + cfg.llm.api_key[-4:] if cfg.llm.api_key else '(not set)'}")
-    print(f"  base_url:  {cfg.llm.base_url}")
-    print(f"  model:     {cfg.llm.model}")
+    console.print(f"Config file: ~/.aura/config.json\n")
+    console.print(f"  asis_path:   {cfg.asis_path}")
+    console.print(f"  doc_path:    {cfg.doc_path}")
+    api_key_display = (
+        "*" * 8 + cfg.llm.api_key[-4:] if cfg.llm.api_key else "(not set)"
+    )
+    console.print(f"  api_key:     {api_key_display}")
+    console.print(f"  base_url:    {cfg.llm.base_url}")
+    console.print(f"  model_name:  {cfg.llm.model_name}")
 
 
 def _set_config(args: list[str]) -> None:
     cfg = load_config()
     if not args:
-        print("Usage: aura config set <key> <value>")
-        print("Keys: api_key, base_url, model, asis_path, doc_path")
+        console.print("Usage: aura config set <key> <value>")
+        console.print("Keys: api_key, base_url, model_name, asis_path, doc_path")
         return
 
     key, *rest = args
@@ -26,19 +35,21 @@ def _set_config(args: list[str]) -> None:
     key_map = {
         "api_key": lambda c, v: setattr(c.llm, "api_key", v),
         "base_url": lambda c, v: setattr(c.llm, "base_url", v),
-        "model": lambda c, v: setattr(c.llm, "model", v),
+        "model_name": lambda c, v: setattr(c.llm, "model_name", v),
+        "model": lambda c, v: setattr(c.llm, "model_name", v),
         "asis_path": lambda c, v: setattr(c, "asis_path", v),
         "doc_path": lambda c, v: setattr(c, "doc_path", v),
     }
 
     if key not in key_map:
-        print(f"Unknown key: {key}")
-        print(f"Valid keys: {', '.join(key_map)}")
+        console.print(f"[red]Unknown key:[/] {key}")
+        console.print(f"Valid keys: {', '.join(key_map)}")
         return
 
     key_map[key](cfg, value)
     save_config(cfg)
-    print(f"Set {key} = {value if key != 'api_key' else '*' * 8 + value[-4:]}")
+    display_value = value if key != "api_key" else "*" * 8 + value[-4:]
+    console.print(f"[green]Set[/] {key} = {display_value}")
 
 
 def _config_command(args: list[str]) -> None:
@@ -47,7 +58,7 @@ def _config_command(args: list[str]) -> None:
     elif args[0] == "set":
         _set_config(args[1:])
     else:
-        print("Usage: aura config [show|set]")
+        console.print("Usage: aura config [show|set]")
 
 
 def main() -> None:
@@ -61,22 +72,29 @@ def main() -> None:
     config.resolve_paths(sys.path[0] if sys.path[0] else ".")
 
     if not config.llm.api_key:
-        print("Error: API key not set. Run 'aura config set api_key <key>' to configure.")
+        console.print(
+            "[red]Error:[/] API key not set. "
+            "Run [bold]aura config set api_key <key>[/bold] to configure."
+        )
         sys.exit(1)
 
     if not config.asis_path.exists():
-        print(f"Error: ASIS executable not found at {config.asis_path}")
-        print("Set asis_path in the config file (~/.aura/config.json).")
+        console.print(f"[red]Error:[/] ASIS executable not found at {config.asis_path}")
+        console.print("Set asis_path in the config file (~/.aura/config.json).")
         sys.exit(1)
 
     agent = AuraAgent(config)
     agent.start()
 
-    print("Aura agent ready. Type 'exit' to quit.\n")
+    console.print(
+        Panel("[bold]Aura[/bold] \u2014 Your AI assistant", border_style="cyan")
+    )
+    console.print("[dim]Type 'exit' to quit.[/dim]\n")
+
     try:
         while True:
             try:
-                user_input = input("You: ").strip()
+                user_input = console.input("[bold green]You:[/] ").strip()
             except EOFError:
                 break
 
@@ -85,9 +103,14 @@ def main() -> None:
             if user_input.lower() == "exit":
                 break
 
-            response = agent.chat(user_input)
-            print(f"\nAura: {response}\n")
+            console.print("[bold cyan]Aura:[/] ", end="")
+            usage = agent.chat_stream(user_input, console)
+            console.print(
+                f"\n[dim]Tokens \u2014 prompt: {usage.prompt_tokens}, "
+                f"completion: {usage.completion_tokens}, "
+                f"total: {usage.total_tokens}[/dim]\n"
+            )
     except KeyboardInterrupt:
-        print()
+        console.print("\n[dim]Interrupted.[/dim]")
     finally:
         agent.close()
