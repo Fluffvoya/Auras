@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 CONFIG_DIR = Path.home() / ".aura"
 CONFIG_FILE = CONFIG_DIR / "config.json"
@@ -11,7 +11,7 @@ CONFIG_FILE = CONFIG_DIR / "config.json"
 class LLMConfig(BaseModel):
     api_key: str = ""
     base_url: str = "https://api.openai.com/v1"
-    model: str = "gpt-4o"
+    model_name: str = Field(default="gpt-4o", validation_alias="model")
 
 
 class AppConfig(BaseModel):

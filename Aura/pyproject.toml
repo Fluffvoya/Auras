@@ -1,12 +1,13 @@
 [project]
 name = "aura"
 version = "0.1.0"
-description = "AI agent for ASIS archive management"
+description = "AI assistant with archive management capabilities"
 readme = "../doc/aura/aura_usage.md"
 requires-python = ">=3.11"
 dependencies = [
     "openai>=1.0.0",
     "pydantic>=2.0",
+    "rich>=13.0",
 ]
 
 [project.scripts]

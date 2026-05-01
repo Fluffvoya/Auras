@@ -16,6 +16,10 @@ class ASISClient:
         self._thread: threading.Thread | None = None
         self._running = False
 
+    @property
+    def is_running(self) -> bool:
+        return self._running and self.proc is not None and self.proc.poll() is None
+
     def _read_stdout(self) -> None:
         while self._running and self.proc:
             try:
