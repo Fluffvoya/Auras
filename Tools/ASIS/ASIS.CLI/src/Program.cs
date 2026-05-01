@@ -18,8 +18,8 @@ class Program
         {
             var archive = _api?.ArchiveName;
             var prompt = archive == null
-                ? "[cyan]>[/] "
-                : $"[magenta][[{archive}]][/] [cyan]>[/] ";
+                ? "[orange3]>[/] "
+                : $"[orange1][[{archive}]][/] [orange3]>[/] ";
             AnsiConsole.Markup(prompt);
             string? input = Console.ReadLine();
             if (input == null) { AnsiConsole.WriteLine(); continue; }
@@ -161,7 +161,7 @@ class Program
         var diff = _api!.Diff();
 
         var table = new Table()
-            .Title("[bold cyan]Archive Info[/]")
+            .Title("[bold darkorange]Archive Info[/]")
             .Border(TableBorder.Rounded)
             .AddColumn(new TableColumn("[bold]Property[/]").LeftAligned())
             .AddColumn(new TableColumn("[bold]Value[/]").LeftAligned());
@@ -436,7 +436,7 @@ class Program
     static void PrintFileInfo(FileRecord file)
     {
         var table = new Table()
-            .Title("[bold cyan]File Info[/]")
+            .Title("[bold darkorange]File Info[/]")
             .Border(TableBorder.Rounded)
             .AddColumn(new TableColumn("[bold]Field[/]").LeftAligned())
             .AddColumn(new TableColumn("[bold]Value[/]").LeftAligned());
@@ -586,7 +586,7 @@ class Program
 
         var table = new Table()
             .Border(TableBorder.Rounded)
-            .AddColumn(new TableColumn("[bold cyan]ID[/]").LeftAligned())
+            .AddColumn(new TableColumn("[bold darkorange]ID[/]").LeftAligned())
             .AddColumn(new TableColumn("[bold]Name[/]").LeftAligned())
             .AddColumn(new TableColumn("[bold]PrimaryTag[/]").LeftAligned())
             .AddColumn(new TableColumn("[bold]Tags[/]").LeftAligned())
@@ -737,7 +737,7 @@ class Program
     static void PrintBatchResult(string operation, BatchResult result)
     {
         var table = new Table()
-            .Title($"[bold cyan]Batch '{operation}' Results[/]")
+            .Title($"[bold darkorange]Batch '{operation}' Results[/]")
             .Border(TableBorder.Rounded)
             .AddColumn(new TableColumn("[bold]Metric[/]").LeftAligned())
             .AddColumn(new TableColumn("[bold]Value[/]").LeftAligned());
@@ -839,7 +839,7 @@ class Program
             .AddColumn(new GridColumn().NoWrap())
             .AddColumn(new GridColumn());
 
-        grid.AddRow("[bold cyan]ASIS.CLI[/]", "[dim]Archive Management Shell[/]");
+        grid.AddRow("[bold darkorange]ASIS.CLI[/]", "[dim]Archive Management Shell[/]");
 
         AnsiConsole.Write(new Rule("[bold]Archive Management[/]").RuleStyle("dim"));
         AnsiConsole.MarkupLine("  [bold]create[/] <name> [[path]]          Create a new archive");

@@ -87,12 +87,12 @@ def main() -> None:
     agent.start()
 
     console.print(
-        Panel("[bold]Aura[/bold] \u2014 Your AI assistant", border_style="cyan")
+        Panel("[bold]Aura[/bold] \u2014 Your AI assistant", border_style="gold3")
     )
     console.print("[dim]Type 'exit' to quit.[/dim]\n")
 
     model_name = config.llm.model_name
-    input_prompt = f"[bold green]You[/] [dim]({model_name})[/]: "
+    input_prompt = f"[bold dark_orange]You[/] [dim]({model_name})[/]: "
 
     try:
         while True:
@@ -106,7 +106,7 @@ def main() -> None:
             if user_input.lower() == "exit":
                 break
 
-            console.print("[bold cyan]Aura:[/] ", end="")
+            console.print("[bold dark_orange]Aura:[/] ", end="")
             usage = agent.chat_stream(user_input, console)
             console.print(
                 f"\n[dim]Tokens \u2014 prompt: {usage.prompt_tokens}, "
