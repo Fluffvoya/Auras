@@ -24,6 +24,7 @@ class Program
     }
 
     private const string Magenta = "\u001b[95m";
+    private const string Red = "\u001b[91m";
     private const string Reset = "\u001b[0m";
     private const string Cyan = "\u001b[96m";
     private const string Bold = "\u001b[1m";
@@ -54,6 +55,9 @@ class Program
 
             // Search
             "search" => Search(tokens),
+
+            // Batch
+            "batch" => BatchCommand(tokens),
 
             // ID lookup
             "id" => IdLookup(tokens),
@@ -244,6 +248,24 @@ class Program
     {
         try { return ResolveFile(identifier); }
         catch { return null; }
+    }
+
+    static List<FileRecord> ResolveFiles(string identifier)
+    {
+        if (identifier.StartsWith("id:", StringComparison.OrdinalIgnoreCase))
+        {
+            string idStr = identifier[3..];
+            if (!Guid.TryParse(idStr, out Guid guid))
+                throw new Exception($"Invalid GUID format: {idStr}");
+
+            var allFiles = _api!.SearchByName("");
+            var file = allFiles.FirstOrDefault(r => r.Id == guid);
+            if (file == null)
+                throw new Exception($"No file found with ID: {guid}");
+            return new List<FileRecord> { file };
+        }
+
+        return _api!.SearchByName(identifier).ToList();
     }
 
     // ==================== File Operations ====================
@@ -576,6 +598,164 @@ class Program
         }
     }
 
+    // ==================== Batch Operations ====================
+
+    static bool BatchCommand(List<string> tokens)
+    {
+        if (!RequireArchive()) return true;
+        if (tokens.Count < 3)
+        {
+            ConsoleWriter.Info("Usage: batch <operation> <file> [args...]");
+            ConsoleWriter.Dimmed("Operations: rename, retag, describe, delete, unlink, tag add, tag remove");
+            ConsoleWriter.Dimmed("Example: batch rename report updated_report");
+            ConsoleWriter.Dimmed("Example: batch tag add vacation landscape,summer");
+            return true;
+        }
+
+        string op = tokens[1].ToLowerInvariant();
+        string fileIdentifier = tokens[2];
+
+        List<FileRecord> files;
+        try
+        {
+            files = ResolveFiles(fileIdentifier);
+        }
+        catch (Exception ex)
+        {
+            ConsoleWriter.Err($"Batch failed: {ex.Message}");
+            return true;
+        }
+
+        if (files.Count == 0)
+        {
+            ConsoleWriter.Warn("No files match the search criteria.");
+            return true;
+        }
+
+        // Prompt confirmation for destructive operations
+        if (IsDestructiveOp(op, tokens))
+        {
+            ConsoleWriter.Warn($"This will affect {files.Count} file(s). Proceed? (y/N)");
+            var response = Console.ReadLine()?.Trim().ToLowerInvariant();
+            if (response != "y" && response != "yes")
+            {
+                ConsoleWriter.Info("Cancelled.");
+                return true;
+            }
+        }
+
+        ConsoleWriter.Info($"Processing {files.Count} file(s)...");
+        var ids = files.Select(f => f.Id).ToList();
+
+        BatchResult? result = op switch
+        {
+            "rename" => BatchRename(ids, tokens),
+            "retag" => BatchRetag(ids, tokens),
+            "describe" => BatchDescribe(ids, tokens),
+            "delete" => _api!.DeleteFile(ids),
+            "unlink" => _api!.DeleteMetadataOnly(ids),
+            "tag" => BatchTagSubcommand(ids, tokens),
+            _ => null
+        };
+
+        if (result == null)
+        {
+            ConsoleWriter.Err($"Unknown batch operation: {op}. Valid: rename, retag, describe, delete, unlink, tag add, tag remove");
+            return true;
+        }
+
+        PrintBatchResult(op, result);
+        return true;
+    }
+
+    static bool IsDestructiveOp(string op, List<string> tokens)
+    {
+        if (op is "delete" or "unlink" or "retag")
+            return true;
+        return false;
+    }
+
+    static BatchResult? BatchTagSubcommand(List<Guid> ids, List<string> tokens)
+    {
+        if (tokens.Count < 4)
+        {
+            ConsoleWriter.Info("Usage: batch tag add|remove <file> <tag1,tag2,...>");
+            return null;
+        }
+
+        return tokens[2].ToLowerInvariant() switch
+        {
+            "add" => BatchTagAdd(ids, tokens),
+            "remove" => BatchTagRemove(ids, tokens),
+            _ => null
+        };
+    }
+
+    static BatchResult BatchRename(List<Guid> ids, List<string> tokens)
+    {
+        if (tokens.Count < 4)
+            throw new Exception("Usage: batch rename <file> <new_name>");
+        return _api!.ChangeFileName(ids, tokens[3]);
+    }
+
+    static BatchResult BatchRetag(List<Guid> ids, List<string> tokens)
+    {
+        if (tokens.Count < 4)
+            throw new Exception("Usage: batch retag <file> <new_primary_tag>");
+        return _api!.ChangePrimaryTag(ids, tokens[3]);
+    }
+
+    static BatchResult BatchDescribe(List<Guid> ids, List<string> tokens)
+    {
+        if (tokens.Count < 4)
+            throw new Exception("Usage: batch describe <file> <description>");
+        string description = string.Join(" ", tokens.Skip(3));
+        return _api!.ChangeDescription(ids, description);
+    }
+
+    static BatchResult BatchTagAdd(List<Guid> ids, List<string> tokens)
+    {
+        if (tokens.Count < 5)
+            throw new Exception("Usage: batch tag add <file> <tag1,tag2,...>");
+        var tags = ParseTags(tokens[4]);
+        return _api!.AddTags(ids, tags);
+    }
+
+    static BatchResult BatchTagRemove(List<Guid> ids, List<string> tokens)
+    {
+        if (tokens.Count < 5)
+            throw new Exception("Usage: batch tag remove <file> <tag1,tag2,...>");
+        var tags = ParseTags(tokens[4]);
+        return _api!.RemoveTags(ids, tags);
+    }
+
+    static void PrintBatchResult(string operation, BatchResult result)
+    {
+        ConsoleWriter.PrintDivider();
+        ConsoleWriter.Title($"Batch '{operation}' Results");
+        ConsoleWriter.Label($"  Total:    ");
+        Console.WriteLine(result.TotalCount);
+        ConsoleWriter.Label($"  Succeeded:");
+        ConsoleWriter.Ok(result.SuccessCount.ToString());
+        ConsoleWriter.Label($"  Failed:   ");
+
+        if (result.FailureCount > 0)
+            Console.WriteLine($"{Red}{result.FailureCount}{Reset}");
+        else
+            Console.WriteLine("0");
+
+        if (result.FailureCount > 0)
+        {
+            ConsoleWriter.Warn("  Failures:");
+            foreach (var item in result.Items.Where(i => !i.IsSuccess))
+            {
+                string errorCode = item.ErrorCode != null ? $" [{item.ErrorCode}]" : "";
+                Console.WriteLine($"    - {Magenta}{item.FileId}{Reset}: {item.Error}{errorCode}");
+            }
+        }
+        ConsoleWriter.PrintDivider();
+    }
+
     // ==================== ID Lookup ====================
 
     static bool IdLookup(List<string> tokens)
@@ -669,6 +849,16 @@ class Program
         Console.WriteLine("    search time <s> <e>     Search by date range");
         Console.WriteLine();
 
+        ConsoleWriter.Label("  Batch Operations:");
+        Console.WriteLine("    batch rename <file> <n>     Batch rename files");
+        Console.WriteLine("    batch retag <file> <tag>    Batch change primary tag");
+        Console.WriteLine("    batch describe <file> <d>   Batch set description");
+        Console.WriteLine("    batch delete <file>         Batch delete files");
+        Console.WriteLine("    batch unlink <file>         Batch unlink metadata");
+        Console.WriteLine("    batch tag add <file> <t>    Batch add tags");
+        Console.WriteLine("    batch tag remove <file> <t> Batch remove tags");
+        Console.WriteLine();
+
         ConsoleWriter.Label("  ID Lookup:");
         Console.WriteLine("    id <guid> [--full]      Look up file by ID");
         Console.WriteLine();
@@ -701,7 +891,8 @@ class Program
             ["search"] = "search name|tag|time <args>\n  Search for files. Types:\n    name <keyword>  - substring match on name\n    tag <t1,t2>     - must have ALL tags\n    time <s> <e>    - date range (yyyy-MM-dd)",
             ["id"] = "id <guid> [--full]\n  Look up a file by its ID. Use --full for complete details.",
             ["help"] = "help [command]\n  Show help for all commands or a specific command.",
-            ["exit"] = "exit\n  Exit the CLI."
+            ["exit"] = "exit\n  Exit the CLI.",
+            ["batch"] = "batch <operation> <file> [args...]\n  Run an operation on all files matching <file>.\n  Operations: rename, retag, describe, delete, unlink, tag add, tag remove\n  Examples:\n    batch rename report new_report\n    batch tag add vacation landscape,summer\n    batch delete temp"
         };
 
         if (helpTexts.TryGetValue(cmd.ToLowerInvariant(), out string? text))

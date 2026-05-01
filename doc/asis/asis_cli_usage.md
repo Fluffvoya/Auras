@@ -72,6 +72,26 @@ open ./archives/myarchive
 |---------|-------------|
 | `id <guid> [--full]` | Look up file by ID. Use `--full` for complete details. |
 
+### Batch Operations
+
+Run an operation on all files matching a search pattern.
+
+| Command | Description |
+|---------|-------------|
+| `batch rename <file> <new_name>` | Rename all matching files. |
+| `batch retag <file> <new_tag>` | Change primary tag on all matching files. |
+| `batch describe <file> <desc>` | Set description on all matching files. |
+| `batch delete <file>` | Delete all matching files and metadata. |
+| `batch unlink <file>` | Remove metadata for all matching files (keep files). |
+| `batch tag add <file> <t1,t2,...>` | Add tags to all matching files. |
+| `batch tag remove <file> <t1,t2,...>` | Remove tags from all matching files. |
+
+**Confirmation**: Destructive operations (`delete`, `unlink`, `retag`) prompt for
+confirmation before executing. Non-destructive ones run immediately.
+
+**Partial failures**: Each file is processed independently. A summary is shown
+at the end with success/failure counts and details of any failures.
+
 ### System
 
 | Command | Description |
@@ -89,6 +109,9 @@ Most commands accept `<file>` as either:
 - **`id:<guid>`** - Exact match by file ID
 
 When multiple files match a substring, use `id:<guid>` for disambiguation.
+
+**Batch commands** use the same `<file>` format but return **all** matching files.
+If zero files match, the operation is cancelled with a warning.
 
 ---
 
@@ -153,6 +176,22 @@ search tag documents,pending
 
 # Find files by date
 search time 2025-01-01 2025-12-31
+```
+
+### Batch Operations
+
+```bash
+# Batch retag all vacation photos
+batch retag vacation holiday
+
+# Batch remove temporary files
+batch delete temp
+
+# Batch add tags to matching files
+batch tag add report quarterly,finance
+
+# Batch describe matching files
+batch describe invoice "Q4 2025 invoice"
 ```
 
 ### Cleanup
