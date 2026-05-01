@@ -20,6 +20,14 @@ Or after activating the virtual environment:
 python -m aura
 ```
 
+## REPL Commands
+
+| Command | Description |
+|---------|-------------|
+| `/exit` | Exit the program |
+
+All other input, including the word `exit`, is treated as normal conversation and sent to the LLM.
+
 ## Configuration
 
 | Variable | Description | Default |
