@@ -21,6 +21,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\Error\AuraError.NET\AuraError.NET.csproj" />
       <ProjectReference Include="..\..\Tools\ASIS\ASIS.Core\ASIS.Core.csproj" />
+      <ProjectReference Include="..\..\Tools\ASIS\ASIS.CLI\ASIS.CLI.csproj" />
     </ItemGroup>
 
 </Project>

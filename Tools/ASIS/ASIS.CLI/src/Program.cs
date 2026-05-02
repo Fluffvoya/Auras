@@ -27,7 +27,7 @@ class Program
         }
     }
 
-    static bool Process(string input)
+    internal static bool Process(string input)
     {
         var tokens = SplitInput(input);
         if (tokens.Count == 0) return true;
@@ -57,7 +57,7 @@ class Program
         };
     }
 
-    static List<string> SplitInput(string input)
+    internal static List<string> SplitInput(string input)
     {
         var result = new List<string>();
         var current = new StringBuilder();
@@ -87,7 +87,7 @@ class Program
         return result;
     }
 
-    static bool RequireArchive()
+    internal static bool RequireArchive()
     {
         if (_api == null)
         {
