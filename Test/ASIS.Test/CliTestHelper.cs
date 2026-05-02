@@ -6,6 +6,7 @@ using Spectre.Console;
 
 namespace ASIS.Test;
 
+
 internal class CliTestHelper : IDisposable
 {
     private readonly string _tmpDir;
@@ -48,12 +49,12 @@ internal class CliTestHelper : IDisposable
         _outputCapture.GetStringBuilder().Clear();
         Console.SetOut(_outputCapture);
         AnsiConsole.Console = CreateConsole();
-        bool result = Program.Process(input);
+        bool result = CommandRouter.Process(input);
         string output = _outputCapture.ToString();
         return (result, output);
     }
 
-    public List<string> SplitInput(string input) => Program.SplitInput(input);
+    public List<string> SplitInput(string input) => CommandRouter.SplitInput(input);
 
     public string CreateSourceFile(string name, string content = "test content")
     {
@@ -81,16 +82,12 @@ internal class CliTestHelper : IDisposable
 
     private static void SetApiField(ASISCoreAPI? api)
     {
-        var field = typeof(Program).GetField("_api",
-            BindingFlags.Static | BindingFlags.NonPublic);
-        field!.SetValue(null, api);
+        CommandRouter.Api = api;
     }
 
     private static ASISCoreAPI? GetApiField()
     {
-        var field = typeof(Program).GetField("_api",
-            BindingFlags.Static | BindingFlags.NonPublic);
-        return (ASISCoreAPI?)field!.GetValue(null);
+        return CommandRouter.Api;
     }
 
     public void Dispose()
