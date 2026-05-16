@@ -9,12 +9,7 @@ Auras is a multi-project engineering effort. It includes the **Aura** AI agent a
 ```
 Auras/
 ├── Aura/                  # Python AI agent
-│   ├── src/
-│   │   ├── agent.py       # Agent loop: conversation, thinking, tool calls
-│   │   ├── asis_client.py # ASIS CLI client wrapper
-│   │   ├── cli.py         # Entry point (argparse)
-│   │   └── config.py      # Env-based configuration
-│   ├── .env.example       # API key & path template
+│   ├── src/               # Agent source code
 │   └── pyproject.toml     # uv-managed Python project
 │
 ├── Error/
@@ -24,14 +19,17 @@ Auras/
 │
 ├── Tools/
 │   └── ASIS/              # Archive System for Indexed Storage
-│       ├── ASIS.CLI/      # CLI frontend (Program.cs, ConsoleWriter, etc.)
+│       ├── ASIS.CLI/      # CLI frontend (Commands, Models, Repositories, Services)
 │       └── ASIS.Core/     # Core library (API, Models, Repositories, Services, Storage, Utils)
 │
 ├── Test/
-│   └── ASIS.Test/         # xUnit tests for ASIS.Core
+│   └── ASIS.Test/         # xUnit tests for ASIS.Core and ASIS.CLI
 │
 ├── doc/                   # Project documentation
+├── .clang-format          # C++ code style
+├── xmake.lua              # C++ build configuration
 ├── Auras.sln              # .NET solution file
+├── nuget.config           # NuGet package source config
 └── CLAUDE.md              # Agent workspace rules
 ```
 
@@ -43,7 +41,7 @@ Auras/
 | `Error/AuraError.NET/` | C# .NET 10 | Shared error handling: typed exceptions, `Result<T>` monad. Referenced by both ASIS projects. |
 | `Tools/ASIS/ASIS.CLI/` | C# .NET 10 | Command-line interface for ASIS: import, search, tag, delete files. |
 | `Tools/ASIS/ASIS.Core/` | C# .NET 10 | Core archive engine: JSON-backed file records, hash/tag indexing, search. |
-| `Test/ASIS.Test/` | C# (xUnit) | Unit tests for ASIS.Core repositories, services, and utilities. |
+| `Test/ASIS.Test/` | C# (xUnit) | Unit tests for ASIS.Core and integration tests for ASIS.CLI. |
 
 ## Dependencies
 
