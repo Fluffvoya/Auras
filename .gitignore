@@ -9,3 +9,4 @@ packages
 **/.venv
 **/__pycache__
 Auras.sln.DotSettings.user
+compile_commands.json

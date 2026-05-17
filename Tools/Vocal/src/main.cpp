@@ -1,6 +1,6 @@
-#include <iostream>
+#include <print>
 
 auto main() -> int {
-    std::cout << "Hello, Vocal!" << std::endl;
+    std::print("Hello Vocal!");
     return 0;
 }
