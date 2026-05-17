@@ -5,6 +5,7 @@
 1. **Read docs first.** Before any task, check `doc/` for relevant documentation. Read the corresponding doc files instead of full source code unless necessary.
 2. **English only.** All documentation, comments, and commit messages must be written in English.
 3. **Respect `.gitignore`.** Never read files or directories listed in `.gitignore`.
+4. **Keep it concise.** Documentation should use concise and refined language. Avoid verbosity.
 
 ## Project Overview
 
@@ -21,13 +22,15 @@ Auras/
 │   ├── ASIS.CLI/      # CLI frontend
 │   └── ASIS.Core/     # Core library
 ├── Test/ASIS.Test/    # Unit tests for ASIS
+├── Tools/Vocal/       # C++ tool (xmake)
 └── doc/               # Project documentation
 ```
 
 ## Key Conventions
 
 - **Python (Aura):** managed via `uv`, requires Python >=3.11
-- **C# (Tools, Error/AuraError.NET, Test):** .NET 10.0
+- **C++ (Tools/Vocal):** managed via `xmake`, requires C++23
+- **C# (Tools/ASIS, Error/AuraError.NET, Test):** .NET 10.0
 - **Documentation:** Markdown files under `doc/`, organized by component
 
 ## Branch Naming Convention
