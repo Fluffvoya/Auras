@@ -1,0 +1,5 @@
+[module]
+module = "asis-core"
+intro = "Core archive library: API facade, repositories, services, JSON storage, and utilities"
+document = "../../doc/asis-core.md"
+requirements = ["asis-error"]

@@ -1,0 +1,5 @@
+[module]
+module = "asis-cli"
+intro = "Interactive CLI frontend for ASIS archive management"
+document = "../../doc/asis-cli.md"
+requirements = ["asis-core"]

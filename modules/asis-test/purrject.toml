@@ -1,0 +1,5 @@
+[module]
+module = "asis-test"
+intro = "xUnit tests for ASIS.Core and ASIS.CLI"
+document = ""
+requirements = ["asis-cli"]

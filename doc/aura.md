@@ -1,4 +1,4 @@
-# Aura
+# aura
 
 AI agent for managing ASIS archives through natural language.
 
@@ -10,15 +10,11 @@ AI agent for managing ASIS archives through natural language.
 
 ## Usage
 
-```bash
-uv run aura
-```
+    uv run aura
 
 Or after activating the virtual environment:
 
-```bash
-python -m aura
-```
+    python -m aura
 
 ## REPL Commands
 

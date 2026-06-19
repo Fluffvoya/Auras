@@ -1,0 +1,5 @@
+[module]
+module = "vocal"
+intro = "C++ placeholder tool (xmake)"
+document = ""
+requirements = []

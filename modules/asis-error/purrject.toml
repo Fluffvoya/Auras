@@ -1,0 +1,5 @@
+[module]
+module = "asis-error"
+intro = "Shared C# exception types and Result<T> monad for error handling"
+document = "../../doc/asis-error.md"
+requirements = []

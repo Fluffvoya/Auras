@@ -1,0 +1,5 @@
+[module]
+module = "aura"
+intro = "Python AI agent with persistent memory, powered by Claude"
+document = "../../doc/aura.md"
+requirements = ["asis-cli"]
