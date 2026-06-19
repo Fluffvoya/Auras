@@ -1,4 +1,4 @@
-# CLAUDE.md — Auras Project
+# CLAUDE.md — Aura Project
 
 ## Before You Start
 
@@ -9,20 +9,19 @@
 
 ## Project Overview
 
-**Auras** (Aura System) is a multi-project engineering effort consisting of the **Aura** AI agent and its supporting tools. Aura is an AI agent with persistent memory and the ability to think proactively. She listens to your joys and worries, helps with daily tasks, and accompanies you through work and play.
+**Aura** is a multi-project engineering effort consisting of the **Aura** AI agent and its supporting tools. Aura is an AI agent with persistent memory and the ability to think proactively. She listens to your joys and worries, helps with daily tasks, and accompanies you through work and play.
 
 ## Project Structure
 
 ```
-Auras/
-├── Aura/              # Python AI agent (Claude-powered)
-├── Error/
-│   └── AuraError.NET/ # Shared C# exception & result types
-├── Tools/ASIS/        # ASIS archive system (C# .NET)
-│   ├── ASIS.CLI/      # CLI frontend
-│   └── ASIS.Core/     # Core library
-├── Test/ASIS.Test/    # Unit tests for ASIS
-├── Tools/Vocal/       # C++ tool (xmake)
+Aura/
+├── modules/
+│   ├── aura/          # Python AI agent (Claude-powered)
+│   ├── asis-error/    # Shared C# exception & result types
+│   ├── asis-core/     # ASIS core library (C# .NET)
+│   ├── asis-cli/      # ASIS CLI frontend (C# .NET)
+│   ├── asis-test/     # Unit tests for ASIS
+│   └── vocal/         # C++ tool (xmake)
 └── doc/               # Project documentation
 ```
 
@@ -30,7 +29,7 @@ Auras/
 
 - **Python (Aura):** managed via `uv`, requires Python >=3.11
 - **C++ (Tools/Vocal):** managed via `xmake`, requires C++23
-- **C# (Tools/ASIS, Error/AuraError.NET, Test):** .NET 10.0
+- **C# (asis-core, asis-cli, asis-error, asis-test):** .NET 10.0
 - **Documentation:** Markdown files under `doc/`, organized by component
 
 ## Branch Naming Convention

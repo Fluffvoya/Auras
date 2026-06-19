@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="icon_text.svg" alt="Auras" width="420">
+  <img src="icon_text.svg" alt="Aura" width="420">
 </p>
 
 <p align="center">

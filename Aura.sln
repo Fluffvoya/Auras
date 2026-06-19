@@ -1,10 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASIS.Core", "Tools\ASIS\ASIS.Core\ASIS.Core.csproj", "{2918E9CC-4BDE-4A9A-AF40-AD01E8BBCDA6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASIS.Core", "modules\asis-core\asis-core.csproj", "{2918E9CC-4BDE-4A9A-AF40-AD01E8BBCDA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASIS.CLI", "Tools\ASIS\ASIS.CLI\ASIS.CLI.csproj", "{EA65F9CB-5D24-49A6-9B00-6D6CF4C7CE2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASIS.CLI", "modules\asis-cli\asis-cli.csproj", "{EA65F9CB-5D24-49A6-9B00-6D6CF4C7CE2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASIS.Test", "Test\ASIS.Test\ASIS.Test.csproj", "{00002C32-227C-46B7-B364-43D7C76BFA38}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASIS.Test", "modules\asis-test\asis-test.csproj", "{00002C32-227C-46B7-B364-43D7C76BFA38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

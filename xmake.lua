@@ -1,4 +1,4 @@
-set_project("Auras")
+set_project("Aura")
 set_version("0.1.0")
 
 set_languages("c++23")
@@ -17,4 +17,4 @@ if is_mode("release") then
     set_strip("all")
 end
 
-includes("Tools/Vocal")
+includes("modules/vocal")

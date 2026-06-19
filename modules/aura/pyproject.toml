@@ -2,7 +2,7 @@
 name = "aura"
 version = "0.1.0"
 description = "AI assistant with archive management capabilities"
-readme = "../doc/aura/aura_usage.md"
+readme = "../../doc/aura.md"
 requires-python = ">=3.11"
 dependencies = [
     "openai>=1.0.0",

@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ASIS.Core\ASIS.Core.csproj" />
+      <ProjectReference Include="..\asis-core\asis-core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

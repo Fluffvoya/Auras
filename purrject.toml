@@ -1,0 +1,10 @@
+[project]
+project_name = "Aura"
+
+[modules]
+asis-error = "modules/asis-error"
+asis-core = "modules/asis-core"
+asis-cli = "modules/asis-cli"
+asis-test = "modules/asis-test"
+aura = "modules/aura"
+vocal = "modules/vocal"

@@ -1,35 +1,22 @@
-# ASIS.CLI - User Manual
-
-**Namespace**: `ASIS.CLI`
-**Project**: `Tools/ASIS/ASIS.CLI`
+# asis-cli
 
 Interactive shell for managing ASIS archives. Provides commands for archive creation, file import/export, tagging, search, and archive maintenance.
-
----
 
 ## Getting Started
 
 ### Build & Run
 
-```bash
-cd Tools/ASIS/ASIS.CLI
-dotnet build
-dotnet run
-```
+    cd Tools/ASIS/ASIS.CLI
+    dotnet build
+    dotnet run
 
 ### Create an Archive
 
-```bash
-create myarchive ./archives
-```
+    create myarchive ./archives
 
 ### Open an Archive
 
-```bash
-open ./archives/myarchive
-```
-
----
+    open ./archives/myarchive
 
 ## Commands
 
@@ -86,11 +73,9 @@ Run an operation on all files matching a search pattern.
 | `batch tag add <file> <t1,t2,...>` | Add tags to all matching files. |
 | `batch tag remove <file> <t1,t2,...>` | Remove tags from all matching files. |
 
-**Confirmation**: Destructive operations (`delete`, `unlink`, `retag`) prompt for
-confirmation before executing. Non-destructive ones run immediately.
+**Confirmation**: Destructive operations (`delete`, `unlink`, `retag`) prompt for confirmation before executing.
 
-**Partial failures**: Each file is processed independently. A summary is shown
-at the end with success/failure counts and details of any failures.
+**Partial failures**: Each file is processed independently. A summary is shown at the end with success/failure counts.
 
 ### System
 
@@ -99,110 +84,56 @@ at the end with success/failure counts and details of any failures.
 | `help [command]` | Show help for all or specific command. |
 | `exit` | Exit CLI. |
 
----
-
 ## File Resolution
 
 Most commands accept `<file>` as either:
 
-- **Name substring** - Matches first file containing the string
-- **`id:<guid>`** - Exact match by file ID
+- **Name substring** — Matches first file containing the string
+- **`id:<guid>`** — Exact match by file ID
 
 When multiple files match a substring, use `id:<guid>` for disambiguation.
 
 **Batch commands** use the same `<file>` format but return **all** matching files.
 If zero files match, the operation is cancelled with a warning.
 
----
-
 ## Examples
 
 ### Basic Workflow
 
-```bash
-# Create and open archive
-create projects ./archives
-open ./archives/projects
-
-# Import files
-import ./docs/readme.md documentation
-import ./src/main.cs code,csharp --desc "Main application entry"
-
-# Search
-search tag documentation
-search name readme
-
-# Update tags
-tag add "readme" overview,getting-started
-tag list "readme"
-
-# Rename and describe
-rename "readme" README.md
-describe "readme" "Project overview and setup instructions"
-
-# View file info
-info "README.md"
-id <guid> --full
-
-# Archive maintenance
-archive
-diff
-```
+    create projects ./archives
+    open ./archives/projects
+    import ./docs/readme.md documentation
+    import ./src/main.cs code,csharp --desc "Main application entry"
+    search tag documentation
+    tag add "readme" overview,getting-started
+    rename "readme" README.md
+    describe "readme" "Project overview and setup instructions"
+    info "README.md"
+    archive
+    diff
 
 ### Import Options
 
-```bash
-# Copy file (default)
-import photo.jpg images
+    import photo.jpg images              # Copy (default)
+    import photo.jpg images --move       # Move
+    import report.pdf documents --desc "Q4 2025 financial report"
+    import data.csv data,csv,analysis    # Multiple tags
 
-# Move file instead
-import photo.jpg images --move
+### Search
 
-# With description
-import report.pdf documents --desc "Q4 2025 financial report"
-
-# Multiple tags
-import data.csv data,csv,analysis
-```
-
-### Search Examples
-
-```bash
-# Find files by name
-search name invoice
-
-# Find files with specific tags
-search tag documents,pending
-
-# Find files by date
-search time 2025-01-01 2025-12-31
-```
+    search name invoice
+    search tag documents,pending
+    search time 2025-01-01 2025-12-31
 
 ### Batch Operations
 
-```bash
-# Batch retag all vacation photos
-batch retag vacation holiday
-
-# Batch remove temporary files
-batch delete temp
-
-# Batch add tags to matching files
-batch tag add report quarterly,finance
-
-# Batch describe matching files
-batch describe invoice "Q4 2025 invoice"
-```
+    batch retag vacation holiday
+    batch delete temp
+    batch tag add report quarterly,finance
+    batch describe invoice "Q4 2025 invoice"
 
 ### Cleanup
 
-```bash
-# Check for problems
-diff
-
-# Remove orphaned metadata (file kept on disk)
-unlink id:<guid>
-
-# Delete everything
-delete id:<guid>
-```
+    diff                    # Check for problems
+    unlink id:<guid>        # Remove orphaned metadata
+    delete id:<guid>        # Delete everything
